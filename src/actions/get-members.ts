@@ -3,9 +3,7 @@
 import { Member } from "@/schemas/member";
 import { clerkClient, User } from "@clerk/nextjs/server";
 
-export async function getMembers(): Promise<
-  Pick<Member, "id" | "fullName" | "emailAddress">[]
-> {
+export async function getMembers(): Promise<Member[]> {
   const client = await clerkClient();
   const users = (
     await client.users.getUserList({
@@ -20,6 +18,7 @@ export async function getMembers(): Promise<
         id: user.id,
         fullName: user.fullName,
         emailAddress: user.primaryEmailAddress?.emailAddress,
+        collectionIds: [],
         admin: user.publicMetadata?.role === "admin",
       };
     })

@@ -2,7 +2,7 @@ import { Member } from "@/schemas/member";
 import { Doc } from "../../convex/_generated/dataModel";
 
 export function mergeMembers(
-  clerkMembers: Pick<Member, "id" | "fullName" | "emailAddress">[] | undefined,
+  clerkMembers: Member[] | undefined,
   convexMembers: Doc<"members">[] | undefined
 ): Member[] {
   if (!clerkMembers || !convexMembers) return [];
