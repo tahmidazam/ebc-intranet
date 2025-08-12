@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/table";
 import { useMembers } from "@/hooks/use-members";
 import { mergeMembers } from "@/lib/merge-members";
+import { noResultsText } from "@/lib/no-results-text";
 import { Member } from "@/schemas/member";
 import {
   ColumnFiltersState,
@@ -148,10 +149,11 @@ export default function Members() {
                 colSpan={columns.length}
                 className="h-24 text-center text-muted-foreground"
               >
-                No results for &quot;
-                {(table.getColumn("fullName")?.getFilterValue() as string) ??
-                  ""}
-                &quot;.
+                {noResultsText(
+                  "members",
+                  (table.getColumn("fullName")?.getFilterValue() as string) ??
+                    ""
+                )}
               </TableCell>
             </TableRow>
           )}

@@ -19,6 +19,7 @@ import {
 import { useState } from "react";
 
 import { columns } from "@/app/admin/collections/columns";
+import { DeleteCollectionAlertDialog } from "@/components/alert-dialogs/delete-collection";
 import { NewCollectionSheet } from "@/components/sheets/new-collection-sheet";
 import {
   Breadcrumb,
@@ -29,12 +30,12 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { noResultsText } from "@/lib/no-results-text";
 import { useQuery } from "convex/react";
 import { Loader2Icon, PlusIcon, TrashIcon } from "lucide-react";
 import { api } from "../../../../convex/_generated/api";
-import { Input } from "@/components/ui/input";
-import { DeleteCollectionAlertDialog } from "@/components/alert-dialogs/delete-collection";
 
 export default function Collections() {
   const collections = useQuery(api.collections.get);
@@ -168,9 +169,10 @@ export default function Collections() {
                 colSpan={columns.length}
                 className="h-24 text-center text-muted-foreground"
               >
-                No results for &quot;
-                {(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-                &quot;.
+                {noResultsText(
+                  "collections",
+                  table.getColumn("title")?.getFilterValue() as string
+                )}
               </TableCell>
             </TableRow>
           )}

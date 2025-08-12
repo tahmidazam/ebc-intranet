@@ -20,6 +20,7 @@ export async function getMembers(): Promise<
         id: user.id,
         fullName: user.fullName,
         emailAddress: user.primaryEmailAddress?.emailAddress,
+        admin: user.publicMetadata?.role === "admin",
       };
     })
     .filter((member) => member !== null);

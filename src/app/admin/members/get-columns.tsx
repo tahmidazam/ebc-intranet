@@ -17,6 +17,14 @@ export const getColumns = (
       accessorKey: "fullName",
     },
     {
+      id: "admin",
+      cell: (params) => {
+        if (!params.row.original.admin) return null;
+
+        return <Badge variant="outline">Admin</Badge>;
+      },
+    },
+    {
       header: "Email",
       accessorKey: "emailAddress",
     },

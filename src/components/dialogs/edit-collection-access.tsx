@@ -20,6 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { noResultsText } from "@/lib/no-results-text";
 import { Member } from "@/schemas/member";
 import {
   ColumnDef,
@@ -172,10 +173,7 @@ export function EditCollectionAccessDialog({
                     colSpan={columns.length}
                     className="h-24 text-center text-muted-foreground"
                   >
-                    No results for &quot;
-                    {(table.getColumn("title")?.getFilterValue() as string) ??
-                      ""}
-                    &quot;.
+                    {noResultsText("collections")}
                   </TableCell>
                 </TableRow>
               )}

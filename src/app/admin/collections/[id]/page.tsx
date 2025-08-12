@@ -1,6 +1,7 @@
 "use client";
 
 import { columns } from "@/app/admin/collections/[id]/columns";
+import { DeleteLinkAlertDialog } from "@/components/alert-dialogs/delete-link";
 import { NewLinkSheet } from "@/components/sheets/new-link-sheet";
 import {
   Breadcrumb,
@@ -10,6 +11,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
@@ -20,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { noResultsText } from "@/lib/no-results-text";
 import {
   ColumnFiltersState,
   flexRender,
@@ -32,8 +35,6 @@ import { Loader2Icon, PlusIcon, TrashIcon } from "lucide-react";
 import { use, useState } from "react";
 import { api } from "../../../../../convex/_generated/api";
 import { Id } from "../../../../../convex/_generated/dataModel";
-import { Button } from "@/components/ui/button";
-import { DeleteLinkAlertDialog } from "@/components/alert-dialogs/delete-link";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -181,12 +182,10 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                 colSpan={columns.length}
                 className="h-24 text-center text-muted-foreground"
               >
-                {table.getRowCount() === 0
-                  ? "No links yet."
-                  : `No results for "${
-                      (table.getColumn("title")?.getFilterValue() as string) ??
-                      ""
-                    }".`}
+                {noResultsText(
+                  "links",
+                  table.getColumn("title")?.getFilterValue() as string
+                )}
               </TableCell>
             </TableRow>
           )}
