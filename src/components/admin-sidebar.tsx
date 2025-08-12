@@ -1,0 +1,72 @@
+"use client";
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
+import { UserSidebarMenuItem } from "@/components/user-sidebar-menu-item";
+import { Library, Users2 } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+const items = [
+  {
+    title: "Collections",
+    href: "/admin/collections",
+    icon: Library,
+  },
+  {
+    title: "Members",
+    href: "/admin/members",
+    icon: Users2,
+  },
+];
+
+export function AdminSidebar() {
+  const pathname = usePathname();
+
+  return (
+    <Sidebar>
+      <SidebarHeader>
+        <SidebarMenu>
+          <UserSidebarMenuItem />
+        </SidebarMenu>
+      </SidebarHeader>
+
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Admin</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {items.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname.startsWith(item.href)}
+                  >
+                    <Link href={item.href}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter>
+        <p className="text-xs text-muted-foreground">© 2025 Tahmid Azam</p>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}
