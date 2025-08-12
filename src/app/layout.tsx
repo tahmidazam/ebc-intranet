@@ -1,3 +1,5 @@
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import ConvexClientProvider from "@/components/convex-client-provider";
 import {
   ClerkProvider,
@@ -22,6 +24,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <Analytics />
+        <SpeedInsights />
         <ClerkProvider>
           <ConvexClientProvider>
             <SignedIn>{children}</SignedIn>
