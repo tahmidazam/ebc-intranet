@@ -80,7 +80,7 @@ export function EditCollectionAccessDialog({
 }) {
   const collections = useQuery(api.collections.get);
   const updateCollectionAccess = useMutation(
-    api.members.updateCollectionAccess
+    api.collectionMembers.updateCollectionAccess
   );
 
   const [rowSelection, setRowSelection] = useState({});
@@ -194,7 +194,7 @@ export function EditCollectionAccessDialog({
               className="rounded-full"
               onClick={() => {
                 updateCollectionAccess({
-                  id: member.id,
+                  clerkId: member.id,
                   collectionIds: table
                     .getFilteredSelectedRowModel()
                     .rows.map((r) => r.original._id),

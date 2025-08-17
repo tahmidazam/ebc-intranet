@@ -37,7 +37,7 @@ import { api } from "../../../../convex/_generated/api";
 
 export default function Members() {
   const { data: clerkMembers, isLoading } = useMembers();
-  const convexMembers = useQuery(api.members.get);
+  const convexMembers = useQuery(api.collectionMembers.getUserCollectionIds);
   const collections = useQuery(api.collections.get);
 
   const members: Member[] = useMemo(

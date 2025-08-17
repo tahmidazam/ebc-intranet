@@ -10,8 +10,10 @@ export default defineSchema({
     url: v.string(),
     collectionId: v.id("collections"),
   }).index("collectionId", ["collectionId"]),
-  members: defineTable({
+  collectionMembers: defineTable({
     clerkId: v.string(),
-    collectionIds: v.array(v.id("collections")),
-  }).index("clerkId", ["clerkId"]),
+    collectionId: v.id("collections"),
+  })
+    .index("clerkId", ["clerkId"])
+    .index("collectionId", ["collectionId"]),
 });
