@@ -7,13 +7,24 @@ import {
   SignedOut,
   SignInButton,
 } from "@clerk/nextjs";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Button } from "@/components/ui/button";
+import { Onboarding } from "@/components/onboarding";
 
 export const metadata: Metadata = {
   title: "EBC",
   description: "The Emmanuel Boat Club Intranet",
+  appleWebApp: {
+    capable: true,
+    title: "EBC Intranet",
+    statusBarStyle: "black-translucent",
+  },
+};
+
+export const viewport: Viewport = {
+  viewportFit: "cover",
+  userScalable: false,
 };
 
 export default function RootLayout({
@@ -31,16 +42,7 @@ export default function RootLayout({
             <SignedIn>{children}</SignedIn>
 
             <SignedOut>
-              <main className="flex flex-col items-center justify-center h-screen max-w-sm mx-auto gap-4">
-                <SignInButton>
-                  <Button className="rounded-full">Sign in</Button>
-                </SignInButton>
-
-                <p className="text-center text-xs text-muted-foreground text-balance">
-                  By continuing, you consent to the use of cookies for
-                  authentication purposes only.
-                </p>
-              </main>
+              <Onboarding />
             </SignedOut>
           </ConvexClientProvider>
         </ClerkProvider>
