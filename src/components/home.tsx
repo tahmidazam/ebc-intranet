@@ -1,8 +1,9 @@
 "use client";
 
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { ProfileDialog } from "@/components/profile-dialog";
+import { Button } from "@/components/ui/button";
 import { useQuery } from "convex/react";
-import { Loader2Icon } from "lucide-react";
+import { Loader2Icon, UserIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { api } from "../../convex/_generated/api";
@@ -19,24 +20,39 @@ export function Home() {
   }
 
   return (
-    <Table>
-      <TableBody>
+    <main className="max-w-lg mx-auto flex flex-col gap-4">
+      <div className="flex justify-between items-center pt-24 px-2">
+        <h1 className="text-2xl tracking-tight font-semibold">EBC Intranet</h1>
+
+        <ProfileDialog collections={collections}>
+          <Button variant="outline" size="icon" className="rounded-full">
+            <UserIcon />
+          </Button>
+        </ProfileDialog>
+      </div>
+
+      <div className="flex flex-col">
         {collections.map((collection) => (
           <React.Fragment key={collection._id}>
-            <TableRow>
-              <TableCell className="font-medium">{collection.title}</TableCell>
-            </TableRow>
+            <h2
+              key={collection._id}
+              className="hover:bg-muted/50 border-b p-2 align-middle whitespace-nowrap font-semibold"
+            >
+              {collection.title}
+            </h2>
 
             {collection.links.map((link) => (
-              <TableRow key={link._id}>
-                <TableCell>
-                  <Link href={link.url}>{link.title}</Link>
-                </TableCell>
-              </TableRow>
+              <Link
+                key={link._id}
+                className="hover:bg-muted/50 border-b p-2 align-middle whitespace-nowrap"
+                href={link.url}
+              >
+                {link.title}
+              </Link>
             ))}
           </React.Fragment>
         ))}
-      </TableBody>
-    </Table>
+      </div>
+    </main>
   );
 }
