@@ -1,5 +1,6 @@
 "use client";
 
+import EditCollectionAccessSheet from "@/components/sheets/edit-collection-access";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
@@ -29,16 +30,31 @@ export const columns: ColumnDef<Doc<"collections">>[] = [
     enableHiding: false,
   },
   {
-    id: "title",
+    accessorKey: "title",
     header: "Title",
+  },
+  {
+    id: "links",
     cell: ({ row }) => {
       return (
         <Link
           className="underline underline-offset-4 decoration-border"
           href={`/admin/collections/${row.original._id}`}
         >
-          {row.original.title}
+          Edit Links
         </Link>
+      );
+    },
+  },
+  {
+    id: "access",
+    cell: ({ row }) => {
+      return (
+        <EditCollectionAccessSheet collectionId={row.original._id}>
+          <p className="underline underline-offset-4 decoration-border">
+            Edit Access
+          </p>
+        </EditCollectionAccessSheet>
       );
     },
     meta: {

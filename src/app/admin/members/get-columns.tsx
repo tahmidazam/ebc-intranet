@@ -1,9 +1,9 @@
 "use client";
 
-import { EditCollectionAccessDialog } from "@/components/dialogs/edit-collection-access";
 import { Badge } from "@/components/ui/badge";
 import { Member } from "@/schemas/member";
 import { ColumnDef } from "@tanstack/react-table";
+import Link from "next/link";
 import { Doc, Id } from "../../../../convex/_generated/dataModel";
 
 export const getColumns = (
@@ -40,8 +40,8 @@ export const getColumns = (
               if (!title) return null;
 
               return (
-                <Badge key={id} variant="outline">
-                  {title}
+                <Badge key={id} variant="outline" asChild>
+                  <Link href={`/admin/collections/${id}`}>{title}</Link>
                 </Badge>
               );
             }) ?? "None"}
@@ -50,18 +50,6 @@ export const getColumns = (
       },
       meta: {
         className: "w-full",
-      },
-    },
-    {
-      id: "edit",
-      cell: ({ row }) => {
-        return (
-          <EditCollectionAccessDialog member={row.original}>
-            <p className="underline-offset-4 underline decoration-border">
-              Edit Access
-            </p>
-          </EditCollectionAccessDialog>
-        );
       },
     },
   ];
