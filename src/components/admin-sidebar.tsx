@@ -13,7 +13,13 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { UserSidebarMenuItem } from "@/components/user-sidebar-menu-item";
-import { Library, Users2 } from "lucide-react";
+import {
+  ChevronLeft,
+  ExternalLink,
+  FolderGit,
+  Library,
+  Users2,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -27,6 +33,19 @@ const items = [
     title: "Members",
     href: "/admin/members",
     icon: Users2,
+  },
+];
+
+const links = [
+  {
+    title: "Back to Intranet",
+    href: "/",
+    icon: ChevronLeft,
+  },
+  {
+    title: "Repository",
+    href: "https://www.github.com/tahmidazam/ebc-intranet",
+    icon: FolderGit,
   },
 ];
 
@@ -55,6 +74,24 @@ export function AdminSidebar() {
                     <Link href={item.href}>
                       <item.icon />
                       <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Links</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {links.map((link) => (
+                <SidebarMenuItem key={link.title}>
+                  <SidebarMenuButton asChild>
+                    <Link href={link.href}>
+                      <link.icon />
+                      <span>{link.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

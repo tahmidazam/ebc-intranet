@@ -35,9 +35,7 @@ export function Home() {
     return (
       <main className="max-w-lg mx-auto flex flex-col gap-4">
         <div className="flex justify-between items-center pt-24 px-4">
-          <h1 className="text-2xl tracking-tight font-semibold">
-            EBC Intranet
-          </h1>
+          <h1 className="font-medium text-2xl tracking-tight">EBC Intranet</h1>
 
           <ProfileDialog collections={collections}>
             <Button variant="outline" size="icon" className="rounded-full">
