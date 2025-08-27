@@ -1,5 +1,6 @@
 "use client";
 
+import { CollectionsList } from "@/components/collections-list";
 import { ProfileDialog } from "@/components/profile-dialog";
 import { ProfileDrawer } from "@/components/profile-drawer";
 import { Button } from "@/components/ui/button";
@@ -9,8 +10,7 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { Loader2Icon, UserIcon } from "lucide-react";
 import { useMotionValueEvent, useScroll } from "motion/react";
-import Link from "next/link";
-import React, { useState } from "react";
+import { useState } from "react";
 import { api } from "../../convex/_generated/api";
 
 export function Home() {
@@ -44,28 +44,7 @@ export function Home() {
           </ProfileDialog>
         </div>
 
-        <div className="flex flex-col">
-          {collections.map((collection) => (
-            <div key={collection._id} className="flex flex-col first:pt-0 pt-4">
-              <h2
-                key={collection._id}
-                className="border-b py-2 px-4 align-middle whitespace-nowrap font-semibold text-sm"
-              >
-                {collection.title}
-              </h2>
-
-              {collection.links.map((link) => (
-                <Link
-                  key={link._id}
-                  className="hover:bg-muted/50 border-b py-2 px-4 align-middle whitespace-nowrap"
-                  href={link.url}
-                >
-                  {link.title}
-                </Link>
-              ))}
-            </div>
-          ))}
-        </div>
+        <CollectionsList collections={collections} />
       </main>
     );
   }
@@ -107,28 +86,7 @@ export function Home() {
         }}
         className="min-h-screen"
       >
-        <div className="flex flex-col">
-          {collections.map((collection) => (
-            <React.Fragment key={collection._id}>
-              <h2
-                key={collection._id}
-                className="hover:bg-muted/50 border-b py-2 px-4 align-middle whitespace-nowrap font-semibold text-sm"
-              >
-                {collection.title}
-              </h2>
-
-              {collection.links.map((link) => (
-                <Link
-                  key={link._id}
-                  className="hover:bg-muted/50 border-b py-2 px-4 align-middle whitespace-nowrap"
-                  href={link.url}
-                >
-                  {link.title}
-                </Link>
-              ))}
-            </React.Fragment>
-          ))}
-        </div>
+        <CollectionsList collections={collections} />
       </div>
     </main>
   );
