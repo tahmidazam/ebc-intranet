@@ -13,13 +13,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { UserSidebarMenuItem } from "@/components/user-sidebar-menu-item";
-import {
-  ChevronLeft,
-  ExternalLink,
-  FolderGit,
-  Library,
-  Users2,
-} from "lucide-react";
+import { ChevronLeft, FolderGit, Library, Users2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
