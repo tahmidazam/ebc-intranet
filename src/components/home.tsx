@@ -54,9 +54,13 @@ export function Home() {
       <div className="fixed top-0 w-full">
         <nav>
           <div
-            className="flex items-center justify-between pb-2 px-4 bg-background/10 backdrop-blur-2xl"
+            className="flex items-center justify-between pb-2 bg-background/10 backdrop-blur-2xl"
             style={{
               paddingTop: "calc(var(--spacing) * 2 + env(safe-area-inset-top))",
+              paddingLeft:
+                "calc(var(--spacing) * 4 + env(safe-area-inset-left))",
+              paddingRight:
+                "calc(var(--spacing) * 4 + env(safe-area-inset-right))",
             }}
           >
             <h1 className="font-medium text-2xl tracking-tight">
@@ -83,6 +87,8 @@ export function Home() {
         style={{
           paddingTop: "calc(env(safe-area-inset-top) + 52px)",
           paddingBottom: "env(safe-area-inset-bottom)",
+          paddingLeft: "calc(var(--spacing) + env(safe-area-inset-left))",
+          paddingRight: "calc(var(--spacing) + env(safe-area-inset-right))",
         }}
         className="min-h-screen"
       >
