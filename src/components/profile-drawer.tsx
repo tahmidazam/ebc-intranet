@@ -10,7 +10,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { useUser } from "@clerk/nextjs";
+import { SignOutButton, useUser } from "@clerk/nextjs";
 import { Doc } from "../../convex/_generated/dataModel";
 
 export function ProfileDrawer({
@@ -47,9 +47,13 @@ export function ProfileDrawer({
         </div>
 
         <DrawerFooter className="grid grid-cols-2">
-          <Button className="rounded-full" variant="destructive">
-            Sign out
-          </Button>
+          <DrawerClose asChild>
+            <SignOutButton>
+              <Button className="rounded-full" variant="destructive">
+                Sign out
+              </Button>
+            </SignOutButton>
+          </DrawerClose>
 
           <DrawerClose asChild>
             <Button className="rounded-full" variant="outline">

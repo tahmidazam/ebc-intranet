@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useUser } from "@clerk/nextjs";
+import { SignOutButton, useUser } from "@clerk/nextjs";
 import { Doc } from "../../convex/_generated/dataModel";
 
 export function ProfileDialog({
@@ -41,9 +41,11 @@ export function ProfileDialog({
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="destructive" className="rounded-full">
-              Sign out
-            </Button>
+            <SignOutButton>
+              <Button variant="destructive" className="rounded-full">
+                Sign out
+              </Button>
+            </SignOutButton>
           </DialogClose>
 
           <DialogClose asChild>
