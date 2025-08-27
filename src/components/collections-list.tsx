@@ -1,7 +1,11 @@
-import Link from "next/link";
-import { Doc } from "../../convex/_generated/dataModel";
 import { useMobileOS } from "@/hooks/use-mobile-os";
+import { useIntranetStore } from "@/lib/store";
 import { transformMobileUrl } from "@/lib/transform-mobile-url";
+import { PinIcon, PinOffIcon } from "lucide-react";
+import Link from "next/link";
+import { useMemo } from "react";
+import { useShallow } from "zustand/shallow";
+import { Doc } from "../../convex/_generated/dataModel";
 
 export function CollectionsList({
   collections,
@@ -9,9 +13,56 @@ export function CollectionsList({
   collections: (Doc<"collections"> & { links: Doc<"links">[] })[];
 }) {
   const os = useMobileOS();
+  const pinnedLinkIds = useIntranetStore(
+    useShallow((state) => state.pinnedLinkIds)
+  );
+  const togglePinLink = useIntranetStore(
+    useShallow((state) => state.togglePinLink)
+  );
+
+  const pinnedLinks: (Doc<"links"> & { collection: Doc<"collections"> })[] =
+    useMemo(() => {
+      const allLinks = collections.flatMap((collection) =>
+        collection.links.map((link) => ({ ...link, collection: collection }))
+      );
+      return allLinks.filter((l) => pinnedLinkIds.includes(l._id));
+    }, [collections, pinnedLinkIds]);
 
   return (
     <div className="flex flex-col">
+      {pinnedLinkIds.length > 0 && (
+        <>
+          <h2 className="border-b py-2 px-4 align-middle whitespace-nowrap font-semibold text-sm">
+            Pinned
+          </h2>
+
+          {pinnedLinks.map((link) => (
+            <div key={link._id} className="flex hover:bg-muted/50 border-b">
+              <Link
+                className="py-2 px-4 align-middle whitespace-nowrap grow"
+                href={transformMobileUrl(link.url, os)}
+              >
+                <p>{link.title}</p>
+                <p className="text-xs text-muted-foreground">
+                  {link.collection.title}
+                </p>
+              </Link>
+
+              <button
+                className="pl-2 pr-4"
+                onClick={() => togglePinLink(link._id)}
+              >
+                {pinnedLinkIds.includes(link._id) ? (
+                  <PinOffIcon className="size-4" />
+                ) : (
+                  <PinIcon className="size-4" />
+                )}
+              </button>
+            </div>
+          ))}
+        </>
+      )}
+
       {collections.map((collection) => (
         <div key={collection._id} className="flex flex-col first:pt-0 pt-4">
           <h2
@@ -22,13 +73,25 @@ export function CollectionsList({
           </h2>
 
           {collection.links.map((link) => (
-            <Link
-              key={link._id}
-              className="hover:bg-muted/50 border-b py-2 px-4 align-middle whitespace-nowrap"
-              href={transformMobileUrl(link.url, os)}
-            >
-              {link.title}
-            </Link>
+            <div key={link._id} className="flex hover:bg-muted/50 border-b">
+              <Link
+                className="py-2 px-4 align-middle whitespace-nowrap grow"
+                href={transformMobileUrl(link.url, os)}
+              >
+                {link.title}
+              </Link>
+
+              <button
+                className="pl-2 pr-4"
+                onClick={() => togglePinLink(link._id)}
+              >
+                {pinnedLinkIds.includes(link._id) ? (
+                  <PinOffIcon className="size-4" />
+                ) : (
+                  <PinIcon className="size-4" />
+                )}
+              </button>
+            </div>
           ))}
         </div>
       ))}

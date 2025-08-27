@@ -87,8 +87,8 @@ export function Home() {
         style={{
           paddingTop: "calc(env(safe-area-inset-top) + 52px)",
           paddingBottom: "env(safe-area-inset-bottom)",
-          paddingLeft: "calc(var(--spacing) + env(safe-area-inset-left))",
-          paddingRight: "calc(var(--spacing) + env(safe-area-inset-right))",
+          paddingLeft: "env(safe-area-inset-left))",
+          paddingRight: "env(safe-area-inset-right))",
         }}
         className="min-h-screen"
       >
