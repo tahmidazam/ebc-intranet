@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { cn } from "@/lib/utils";
+import { useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
-import { Loader2Icon, UserIcon } from "lucide-react";
+import { Loader2Icon, LockIcon, UserIcon } from "lucide-react";
 import { useMotionValueEvent, useScroll } from "motion/react";
+import Link from "next/link";
 import { useState } from "react";
 import { api } from "../../convex/_generated/api";
 
@@ -18,6 +20,7 @@ export function Home() {
   const isMobile = useIsMobile();
   const { scrollY } = useScroll();
   const [showBorder, setShowBorder] = useState(false);
+  const { user } = useUser();
 
   useMotionValueEvent(scrollY, "change", (current) => {
     setShowBorder(current > 0);
@@ -37,11 +40,21 @@ export function Home() {
         <div className="flex justify-between items-center pt-24 px-4">
           <h1 className="font-medium text-2xl tracking-tight">EBC Intranet</h1>
 
-          <ProfileDialog collections={collections}>
-            <Button variant="outline" size="icon" className="rounded-full">
-              <UserIcon />
-            </Button>
-          </ProfileDialog>
+          <div className="flex gap-2">
+            {user?.publicMetadata.role === "admin" && (
+              <Button variant="outline" size="icon" className="rounded-full">
+                <Link href="/admin/collections">
+                  <LockIcon />
+                </Link>
+              </Button>
+            )}
+
+            <ProfileDialog collections={collections}>
+              <Button variant="outline" size="icon" className="rounded-full">
+                <UserIcon />
+              </Button>
+            </ProfileDialog>
+          </div>
         </div>
 
         <CollectionsList collections={collections} />
