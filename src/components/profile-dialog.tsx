@@ -4,6 +4,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogTitle,
   DialogTrigger,
@@ -23,42 +24,31 @@ export function ProfileDialog({
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="rounded-3xl p-4">
-        <DialogTitle>Profile</DialogTitle>
+        <div>
+          <DialogTitle>{user?.fullName}</DialogTitle>
+          <DialogDescription>
+            {user?.primaryEmailAddress?.emailAddress}
+          </DialogDescription>
+        </div>
 
-        <div className="flex flex-col gap-y-4">
-          <div className="flex gap-4">
-            <div className="flex flex-col">
-              <p className="text-sm text-muted-foreground">Name</p>
-              <p>{user?.fullName}</p>
-            </div>
-
-            <div className="flex flex-col">
-              <p className="text-sm text-muted-foreground">Email</p>
-              <p>{user?.primaryEmailAddress?.emailAddress}</p>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <p className="text-sm text-muted-foreground">Collection Access</p>
-            <div className="flex flex-wrap gap-2">
-              {collections.map((collection) => (
-                <Badge key={collection._id} variant="outline">
-                  {collection.title}
-                </Badge>
-              ))}
-            </div>
-          </div>
+        <div className="flex flex-wrap gap-2">
+          {collections.map((collection) => (
+            <Badge key={collection._id} variant="outline">
+              {collection.title}
+            </Badge>
+          ))}
         </div>
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline" className="rounded-full">
-              Close
-            </Button>
-          </DialogClose>
-          <DialogClose asChild>
             <Button variant="destructive" className="rounded-full">
               Sign out
+            </Button>
+          </DialogClose>
+
+          <DialogClose asChild>
+            <Button variant="outline" className="rounded-full">
+              Close
             </Button>
           </DialogClose>
         </DialogFooter>
