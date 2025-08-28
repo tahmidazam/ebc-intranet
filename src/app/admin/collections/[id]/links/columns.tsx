@@ -1,11 +1,11 @@
 "use client";
 
-import { Checkbox } from "@/components/ui/checkbox";
 import { ColumnDef } from "@tanstack/react-table";
+import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
-import { Doc } from "../../../../convex/_generated/dataModel";
+import { Doc } from "../../../../../../convex/_generated/dataModel";
 
-export const columns: ColumnDef<Doc<"collections">>[] = [
+export const columns: ColumnDef<Doc<"links">>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -33,27 +33,15 @@ export const columns: ColumnDef<Doc<"collections">>[] = [
     header: "Title",
   },
   {
-    id: "links",
+    id: "url",
+    header: "URL",
     cell: ({ row }) => {
       return (
         <Link
           className="underline underline-offset-4 decoration-border"
-          href={`/admin/collections/${row.original._id}/links`}
+          href={row.original.url}
         >
-          Edit Links
-        </Link>
-      );
-    },
-  },
-  {
-    id: "access",
-    cell: ({ row }) => {
-      return (
-        <Link
-          className="underline underline-offset-4 decoration-border"
-          href={`/admin/collections/${row.original._id}/access`}
-        >
-          Edit Access
+          {row.original.url}
         </Link>
       );
     },

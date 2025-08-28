@@ -1,8 +1,6 @@
 "use client";
 
-import { columns } from "@/app/admin/collections/[id]/columns";
-import { DeleteLinkAlertDialog } from "@/components/alert-dialogs/delete-link";
-import { NewLinkSheet } from "@/components/sheets/new-link-sheet";
+import { columns } from "@/app/admin/collections/[id]/access/columns";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -22,6 +20,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useMembers } from "@/hooks/use-members";
+import { mergeMembers } from "@/lib/merge-members";
 import { noResultsText } from "@/lib/no-results-text";
 import {
   ColumnFiltersState,
@@ -30,26 +30,43 @@ import {
   getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useQuery } from "convex/react";
-import { Loader2Icon, PlusIcon, TrashIcon } from "lucide-react";
-import { use, useState } from "react";
-import { api } from "../../../../../convex/_generated/api";
-import { Id } from "../../../../../convex/_generated/dataModel";
+import { useMutation, useQuery } from "convex/react";
+import { Loader2Icon, SaveIcon } from "lucide-react";
+import { use, useEffect, useMemo, useState } from "react";
+import { api } from "../../../../../../convex/_generated/api";
+import { Id } from "../../../../../../convex/_generated/dataModel";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const collection = useQuery(api.collections.getById, {
     id: id as Id<"collections">,
   });
-  const links = useQuery(api.links.getByCollectionId, {
+  const collectionClerkIds = useQuery(
+    api.collectionMembers.getCollectionClerkIds,
+    {
+      collectionId: id as Id<"collections">,
+    }
+  );
+  const { data: clerkMembers, isLoading } = useMembers();
+
+  const convexMembers = useQuery(api.collectionMembers.getUserCollectionIds);
+  const clerkIds = useQuery(api.collectionMembers.getCollectionClerkIds, {
     collectionId: id as Id<"collections">,
   });
+  const updateCollectionAccess = useMutation(
+    api.collectionMembers.updateCollectionAccess
+  );
+
+  const members = useMemo(
+    () => mergeMembers(clerkMembers, convexMembers),
+    [clerkMembers, convexMembers]
+  );
 
   const [rowSelection, setRowSelection] = useState({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   const table = useReactTable({
-    data: links ?? [],
+    data: members ?? [],
     columns,
     onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
@@ -61,7 +78,30 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     },
   });
 
-  if (!links || !collection)
+  useEffect(() => {
+    if (clerkIds) {
+      const selectedRows: Record<string, boolean> = {};
+      table.getRowModel().rows.forEach((row) => {
+        if (clerkIds.includes(row.original.id)) {
+          selectedRows[row.id] = true;
+        }
+      });
+      setRowSelection(selectedRows);
+    }
+  }, [members, clerkIds, table]);
+
+  const changes = useMemo(() => {
+    const setA = new Set(
+      table.getSelectedRowModel().rows.map((r) => r.original.id)
+    );
+    const setB = new Set(collectionClerkIds);
+
+    return setA.size !== setB.size || [...setA].some((id) => !setB.has(id));
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rowSelection, collectionClerkIds, table]);
+
+  if (isLoading || !members || !collection || !collectionClerkIds)
     return (
       <main className="flex items-center justify-center h-screen w-full">
         <Loader2Icon className="animate-spin" />
@@ -91,46 +131,44 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
               <BreadcrumbSeparator />
 
               <BreadcrumbItem>
-                <BreadcrumbPage>{collection.title}</BreadcrumbPage>
+                <BreadcrumbLink href="/admin/collections">
+                  {collection.title}
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+
+              <BreadcrumbSeparator />
+
+              <BreadcrumbItem>
+                <BreadcrumbPage>Access</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </div>
 
         <div className="flex flex-row items-center gap-2">
-          {table.getFilteredSelectedRowModel().rows.length > 0 && (
-            <DeleteLinkAlertDialog
-              collectionIds={table
-                .getFilteredSelectedRowModel()
-                .rows.map((row) => row.original._id)}
-              onActionComplete={table.resetRowSelection}
-            >
-              <Button
-                variant="destructive"
-                className="rounded-full"
-                size="icon"
-              >
-                <TrashIcon />
-              </Button>
-            </DeleteLinkAlertDialog>
-          )}
-
-          <NewLinkSheet collectionId={id as Id<"collections">}>
-            <Button
-              variant="outline"
-              size="icon"
-              className="rounded-full"
-              disabled={table.getFilteredSelectedRowModel().rows.length > 0}
-            >
-              <PlusIcon />
-            </Button>
-          </NewLinkSheet>
+          <Button
+            size="icon"
+            className="rounded-full"
+            onClick={() => {
+              updateCollectionAccess({
+                collectionId: id as Id<"collections">,
+                clerkIds: table
+                  .getSelectedRowModel()
+                  .rows.map((r) => r.original.id),
+              });
+            }}
+            disabled={!changes}
+          >
+            <SaveIcon />
+          </Button>
 
           <Input
             placeholder="Filter"
-            value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+            value={
+              (table.getColumn("fullName")?.getFilterValue() as string) ?? ""
+            }
             onChange={(event) =>
-              table.getColumn("title")?.setFilterValue(event.target.value)
+              table.getColumn("fullName")?.setFilterValue(event.target.value)
             }
             className="max-w-sm rounded-full"
           />
@@ -183,8 +221,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                 className="h-24 text-center text-muted-foreground"
               >
                 {noResultsText(
-                  "links",
-                  table.getColumn("title")?.getFilterValue() as string
+                  "members",
+                  table.getColumn("fullName")?.getFilterValue() as string
                 )}
               </TableCell>
             </TableRow>

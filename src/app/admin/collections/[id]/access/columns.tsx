@@ -1,11 +1,8 @@
-"use client";
-
-import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Doc } from "../../../../../convex/_generated/dataModel";
-import Link from "next/link";
+import { Member } from "@/schemas/member";
+import { ColumnDef } from "@tanstack/react-table";
 
-export const columns: ColumnDef<Doc<"links">>[] = [
+export const columns: ColumnDef<Member>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -29,22 +26,8 @@ export const columns: ColumnDef<Doc<"links">>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "title",
-    header: "Title",
-  },
-  {
-    id: "url",
-    header: "URL",
-    cell: ({ row }) => {
-      return (
-        <Link
-          className="underline underline-offset-4 decoration-border"
-          href={row.original.url}
-        >
-          {row.original.url}
-        </Link>
-      );
-    },
+    header: "Full Name",
+    accessorKey: "fullName",
     meta: {
       className: "w-full",
     },

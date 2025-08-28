@@ -1,6 +1,7 @@
 "use client";
 
-import { getColumns } from "@/app/admin/members/get-columns";
+import { DeleteLinkAlertDialog } from "@/components/alert-dialogs/delete-link";
+import { NewLinkSheet } from "@/components/sheets/new-link-sheet";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,6 +10,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
@@ -19,8 +21,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useMembers } from "@/hooks/use-members";
-import { mergeMembers } from "@/lib/merge-members";
 import { noResultsText } from "@/lib/no-results-text";
 import {
   ColumnFiltersState,
@@ -30,26 +30,26 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useQuery } from "convex/react";
-import { Loader2Icon } from "lucide-react";
-import { useMemo, useState } from "react";
-import { api } from "../../../../convex/_generated/api";
+import { Loader2Icon, PlusIcon, TrashIcon } from "lucide-react";
+import { use, useState } from "react";
+import { Id } from "../../../../../../convex/_generated/dataModel";
+import { api } from "../../../../../../convex/_generated/api";
+import { columns } from "@/app/admin/collections/[id]/links/columns";
 
-export default function Members() {
-  const { data: clerkMembers, isLoading } = useMembers();
-  const convexMembers = useQuery(api.collectionMembers.getUserCollectionIds);
-  const collections = useQuery(api.collections.get);
-
-  const members = useMemo(
-    () => mergeMembers(clerkMembers, convexMembers),
-    [clerkMembers, convexMembers]
-  );
-  const columns = useMemo(() => getColumns(collections ?? []), [collections]);
+export default function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const collection = useQuery(api.collections.getById, {
+    id: id as Id<"collections">,
+  });
+  const links = useQuery(api.links.getByCollectionId, {
+    collectionId: id as Id<"collections">,
+  });
 
   const [rowSelection, setRowSelection] = useState({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   const table = useReactTable({
-    data: members ?? [],
+    data: links ?? [],
     columns,
     onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
@@ -61,7 +61,7 @@ export default function Members() {
     },
   });
 
-  if (isLoading || !members || !collections)
+  if (!links || !collection)
     return (
       <main className="flex items-center justify-center h-screen w-full">
         <Loader2Icon className="animate-spin" />
@@ -83,20 +83,54 @@ export default function Members() {
               <BreadcrumbSeparator />
 
               <BreadcrumbItem>
-                <BreadcrumbPage>Members</BreadcrumbPage>
+                <BreadcrumbLink href="/admin/collections">
+                  Collections
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+
+              <BreadcrumbSeparator />
+
+              <BreadcrumbItem>
+                <BreadcrumbPage>{collection.title}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </div>
 
         <div className="flex flex-row items-center gap-2">
+          {table.getFilteredSelectedRowModel().rows.length > 0 && (
+            <DeleteLinkAlertDialog
+              collectionIds={table
+                .getFilteredSelectedRowModel()
+                .rows.map((row) => row.original._id)}
+              onActionComplete={table.resetRowSelection}
+            >
+              <Button
+                variant="destructive"
+                className="rounded-full"
+                size="icon"
+              >
+                <TrashIcon />
+              </Button>
+            </DeleteLinkAlertDialog>
+          )}
+
+          <NewLinkSheet collectionId={id as Id<"collections">}>
+            <Button
+              variant="outline"
+              size="icon"
+              className="rounded-full"
+              disabled={table.getFilteredSelectedRowModel().rows.length > 0}
+            >
+              <PlusIcon />
+            </Button>
+          </NewLinkSheet>
+
           <Input
             placeholder="Filter"
-            value={
-              (table.getColumn("fullName")?.getFilterValue() as string) ?? ""
-            }
+            value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
-              table.getColumn("fullName")?.setFilterValue(event.target.value)
+              table.getColumn("title")?.setFilterValue(event.target.value)
             }
             className="max-w-sm rounded-full"
           />
@@ -149,9 +183,8 @@ export default function Members() {
                 className="h-24 text-center text-muted-foreground"
               >
                 {noResultsText(
-                  "members",
-                  (table.getColumn("fullName")?.getFilterValue() as string) ??
-                    ""
+                  "links",
+                  table.getColumn("title")?.getFilterValue() as string
                 )}
               </TableCell>
             </TableRow>

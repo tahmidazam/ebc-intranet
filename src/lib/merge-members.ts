@@ -8,8 +8,8 @@ export function mergeMembers(
         collectionIds: string[];
       }[]
     | undefined
-): Member[] {
-  if (!clerkMembers || !convexMembers) return [];
+): Member[] | undefined {
+  if (!clerkMembers || !convexMembers) return undefined;
 
   const convexMap = new Map(convexMembers.map((m) => [m.clerkId, m]));
   const members = clerkMembers.map((m) => ({
