@@ -61,3 +61,26 @@ export const updateCollectionAccess = mutation({
     }
   },
 });
+
+export const updateAccessToCollectionsForGroup = mutation({
+  args: {
+    clerkIds: v.array(v.string()),
+    collectionIds: v.array(v.id("collections")),
+  },
+  handler: async (ctx, { clerkIds, collectionIds }) => {
+    for (const clerkId of clerkIds) {
+      for (const collectionId of collectionIds) {
+        const existing = await ctx.db
+          .query("collectionMembers")
+          .withIndex("clerkId_collectionId", (q) =>
+            q.eq("clerkId", clerkId).eq("collectionId", collectionId)
+          )
+          .first();
+
+        if (!existing) {
+          await ctx.db.insert("collectionMembers", { clerkId, collectionId });
+        }
+      }
+    }
+  },
+});

@@ -13,7 +13,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { UserSidebarMenuItem } from "@/components/user-sidebar-menu-item";
-import { ChevronLeft, FolderGit, Library, Users2 } from "lucide-react";
+import { ChevronLeft, FolderGit, Grid3x2, Library, Users2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -27,6 +27,14 @@ const items = [
     title: "Members",
     href: "/admin/members",
     icon: Users2,
+  },
+];
+
+const tools = [
+  {
+    title: "Bulk Update Access",
+    href: "/admin/tools/bulk-update-access",
+    icon: Grid3x2,
   },
 ];
 
@@ -68,6 +76,27 @@ export function AdminSidebar() {
                     <Link href={item.href}>
                       <item.icon />
                       <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Tools</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {tools.map((tool) => (
+                <SidebarMenuItem key={tool.title}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname.startsWith(tool.href)}
+                  >
+                    <Link href={tool.href}>
+                      <tool.icon />
+                      <span>{tool.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

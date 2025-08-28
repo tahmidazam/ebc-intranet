@@ -15,5 +15,6 @@ export default defineSchema({
     collectionId: v.id("collections"),
   })
     .index("clerkId", ["clerkId"])
-    .index("collectionId", ["collectionId"]),
+    .index("collectionId", ["collectionId"])
+    .index("clerkId_collectionId", ["clerkId", "collectionId"]),
 });
