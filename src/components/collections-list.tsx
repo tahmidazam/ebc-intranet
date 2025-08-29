@@ -19,6 +19,9 @@ export function CollectionsList({
   const togglePinLink = useIntranetStore(
     useShallow((state) => state.togglePinLink)
   );
+  const showEmptyCollections = useIntranetStore(
+    useShallow((state) => state.showEmptyCollections)
+  );
 
   const pinnedLinks: (Doc<"links"> & { collection: Doc<"collections"> })[] =
     useMemo(() => {
@@ -63,38 +66,45 @@ export function CollectionsList({
         </>
       )}
 
-      {collections.map((collection) => (
-        <div key={collection._id} className="flex flex-col first:pt-0 pt-4">
-          <h2
-            key={collection._id}
-            className="border-b py-2 px-4 align-middle whitespace-nowrap font-semibold text-sm"
-          >
-            {collection.title}
-          </h2>
+      {collections
+        .filter((collection) => {
+          if (!showEmptyCollections) {
+            return collection.links.length > 0;
+          }
+          return true;
+        })
+        .map((collection) => (
+          <div key={collection._id} className="flex flex-col first:pt-0 pt-4">
+            <h2
+              key={collection._id}
+              className="border-b py-2 px-4 align-middle whitespace-nowrap font-semibold text-sm"
+            >
+              {collection.title}
+            </h2>
 
-          {collection.links.map((link) => (
-            <div key={link._id} className="flex hover:bg-muted/50 border-b">
-              <Link
-                className="py-2 px-4 align-middle whitespace-nowrap grow"
-                href={transformMobileUrl(link.url, os)}
-              >
-                {link.title}
-              </Link>
+            {collection.links.map((link) => (
+              <div key={link._id} className="flex hover:bg-muted/50 border-b">
+                <Link
+                  className="py-2 px-4 align-middle whitespace-nowrap grow"
+                  href={transformMobileUrl(link.url, os)}
+                >
+                  {link.title}
+                </Link>
 
-              <button
-                className="pl-2 pr-4"
-                onClick={() => togglePinLink(link._id)}
-              >
-                {pinnedLinkIds.includes(link._id) ? (
-                  <PinOffIcon className="size-4" />
-                ) : (
-                  <PinIcon className="size-4" />
-                )}
-              </button>
-            </div>
-          ))}
-        </div>
-      ))}
+                <button
+                  className="pl-2 pr-4"
+                  onClick={() => togglePinLink(link._id)}
+                >
+                  {pinnedLinkIds.includes(link._id) ? (
+                    <PinOffIcon className="size-4" />
+                  ) : (
+                    <PinIcon className="size-4" />
+                  )}
+                </button>
+              </div>
+            ))}
+          </div>
+        ))}
     </div>
   );
 }

@@ -1,15 +1,15 @@
 "use client";
 
 import { CollectionsList } from "@/components/collections-list";
+import { PreferencesDrawer } from "@/components/preferences-drawer";
 import { ProfileDialog } from "@/components/profile-dialog";
-import { ProfileDrawer } from "@/components/profile-drawer";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
-import { Loader2Icon, LockIcon, UserIcon } from "lucide-react";
+import { Loader2Icon, LockIcon, SettingsIcon, UserIcon } from "lucide-react";
 import { useMotionValueEvent, useScroll } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
@@ -80,11 +80,11 @@ export function Home() {
               EBC Intranet
             </h1>
 
-            <ProfileDrawer collections={collections}>
+            <PreferencesDrawer collections={collections}>
               <Button variant="outline" size="icon" className="rounded-full">
-                <UserIcon />
+                <SettingsIcon />
               </Button>
-            </ProfileDrawer>
+            </PreferencesDrawer>
           </div>
 
           <Separator

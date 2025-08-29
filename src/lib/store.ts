@@ -4,6 +4,8 @@ import { persist } from "zustand/middleware";
 interface IntranetState {
   pinnedLinkIds: string[];
   togglePinLink: (linkId: string) => void;
+  showEmptyCollections: boolean;
+  setShowEmptyCollections: (value: boolean) => void;
 }
 
 export const useIntranetStore = create<IntranetState>()(
@@ -16,6 +18,9 @@ export const useIntranetStore = create<IntranetState>()(
             ? state.pinnedLinkIds.filter((id) => id !== linkId)
             : [...state.pinnedLinkIds, linkId],
         })),
+      showEmptyCollections: false,
+      setShowEmptyCollections: (value: boolean) =>
+        set({ showEmptyCollections: value }),
     }),
     {
       name: "intranet-store",
