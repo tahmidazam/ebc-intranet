@@ -30,6 +30,12 @@ export function PreferencesDrawer({
   const setShowEmptyCollections = useIntranetStore(
     useShallow((state) => state.setShowEmptyCollections)
   );
+  const showCollectionInPinnedLinks = useIntranetStore(
+    useShallow((state) => state.showCollectionInPinnedLinks)
+  );
+  const setShowCollectionInPinnedLinks = useIntranetStore(
+    useShallow((state) => state.setShowCollectionInPinnedLinks)
+  );
 
   return (
     <Drawer>
@@ -87,7 +93,7 @@ export function PreferencesDrawer({
           View
         </h2>
 
-        <div className="p-4">
+        <div className="p-4 flex flex-col gap-4">
           <div className="flex items-center space-x-2">
             <Switch
               id="show-empty-collections"
@@ -96,6 +102,17 @@ export function PreferencesDrawer({
             />
             <Label htmlFor="show-empty-collections">
               Show Empty Collections
+            </Label>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="show-collection-in-pinned-link"
+              checked={showCollectionInPinnedLinks}
+              onCheckedChange={setShowCollectionInPinnedLinks}
+            />
+            <Label htmlFor="show-collection-in-pinned-link">
+              <p>Show Collection in Pinned Links</p>
             </Label>
           </div>
         </div>

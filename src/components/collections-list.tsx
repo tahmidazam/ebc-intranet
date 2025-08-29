@@ -22,6 +22,9 @@ export function CollectionsList({
   const showEmptyCollections = useIntranetStore(
     useShallow((state) => state.showEmptyCollections)
   );
+  const showCollectionInPinnedLinks = useIntranetStore(
+    useShallow((state) => state.showCollectionInPinnedLinks)
+  );
 
   const pinnedLinks: (Doc<"links"> & { collection: Doc<"collections"> })[] =
     useMemo(() => {
@@ -46,9 +49,11 @@ export function CollectionsList({
                 href={transformMobileUrl(link.url, os)}
               >
                 <p>{link.title}</p>
-                <p className="text-xs text-muted-foreground">
-                  {link.collection.title}
-                </p>
+                {showCollectionInPinnedLinks && (
+                  <p className="text-xs text-muted-foreground">
+                    {link.collection.title}
+                  </p>
+                )}
               </Link>
 
               <button

@@ -6,6 +6,8 @@ interface IntranetState {
   togglePinLink: (linkId: string) => void;
   showEmptyCollections: boolean;
   setShowEmptyCollections: (value: boolean) => void;
+  showCollectionInPinnedLinks: boolean;
+  setShowCollectionInPinnedLinks: (value: boolean) => void;
 }
 
 export const useIntranetStore = create<IntranetState>()(
@@ -21,6 +23,9 @@ export const useIntranetStore = create<IntranetState>()(
       showEmptyCollections: false,
       setShowEmptyCollections: (value: boolean) =>
         set({ showEmptyCollections: value }),
+      showCollectionInPinnedLinks: true,
+      setShowCollectionInPinnedLinks: (value: boolean) =>
+        set({ showCollectionInPinnedLinks: value }),
     }),
     {
       name: "intranet-store",
