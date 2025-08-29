@@ -36,6 +36,12 @@ export function PreferencesDrawer({
   const setShowCollectionInPinnedLinks = useIntranetStore(
     useShallow((state) => state.setShowCollectionInPinnedLinks)
   );
+  const keepCollectionsCollapsed = useIntranetStore(
+    useShallow((state) => state.keepCollectionsCollapsed)
+  );
+  const setKeepCollectionsCollapsed = useIntranetStore(
+    useShallow((state) => state.setKeepCollectionsCollapsed)
+  );
 
   return (
     <Drawer>
@@ -113,6 +119,17 @@ export function PreferencesDrawer({
             />
             <Label htmlFor="show-collection-in-pinned-link">
               <p>Show Collection in Pinned Links</p>
+            </Label>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="collections-collapsed-by-default"
+              checked={keepCollectionsCollapsed}
+              onCheckedChange={setKeepCollectionsCollapsed}
+            />
+            <Label htmlFor="collections-collapsed-by-default">
+              <p>Keep Collections Collapsed</p>
             </Label>
           </div>
         </div>
