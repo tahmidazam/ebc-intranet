@@ -12,13 +12,6 @@ export function transformMobileUrl(
       return linkUrl.replace(/^https:/, "googlesheets:");
     }
 
-    if (url.hostname === "www.instagram.com") {
-      return linkUrl.replace(
-        "https://www.instagram.com/",
-        "instagram://user?username="
-      );
-    }
-
     return `x-safari-${url}`;
   }
 
