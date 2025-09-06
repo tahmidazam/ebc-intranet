@@ -23,7 +23,7 @@ export const ResendOTP = Email({
       from: "EBC Intranet <auth@ebc-intranet.co.uk>",
       to: [email],
       subject: `${token} is your verification code`,
-      text: `Enter the following code when prompted:\n\n${token}\n\nTo protect your account, do not share this code.`,
+      text: `<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /></head><body><h1>EBC Intranet</h1><p>Enter the following code when prompted:</p><p>${token}</p><p>To protect your account, do not share this code.</p></body></html>`,
     });
 
     if (error) {
