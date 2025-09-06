@@ -55,7 +55,7 @@ export default function SignIn() {
         </div>
 
         <Input
-          placeholder="CRSid"
+          placeholder="CRSid@cam.ac.uk"
           autoComplete="email"
           autoFocus
           name="email"
