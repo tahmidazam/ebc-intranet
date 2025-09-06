@@ -37,7 +37,7 @@ export default function SignIn() {
           }
 
           try {
-            const response = await signIn("resend-otp", {
+            await signIn("resend-otp", {
               email: formData.get("email") as string,
             });
             setStep({ email: formData.get("email") as string });
@@ -83,10 +83,7 @@ export default function SignIn() {
           const formData = new FormData(event.currentTarget);
 
           try {
-            const response: {
-              signingIn: boolean;
-              redirect?: URL;
-            } = await signIn("resend-otp", {
+            await signIn("resend-otp", {
               email: formData.get("email") as string,
               code: formData.get("code") as string,
             });
