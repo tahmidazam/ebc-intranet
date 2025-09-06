@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { Doc } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
+import { getAuthUserId } from "@convex-dev/auth/server";
 
 export const get = query({
   handler: async (ctx) => ctx.db.query("collections").collect(),
@@ -29,13 +30,13 @@ export const getById = query({
 
 export const getUserCollectionsWithLinks = query({
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
+    const userId = await getAuthUserId(ctx);
 
-    if (!identity) return null;
+    if (!userId) return null;
 
     const memberships = await ctx.db
       .query("collectionMembers")
-      .withIndex("clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("userId", (q) => q.eq("userId", userId))
       .collect();
 
     if (memberships.length === 0) return [];

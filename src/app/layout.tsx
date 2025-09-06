@@ -1,5 +1,5 @@
 import ConvexClientProvider from "@/components/convex-client-provider";
-import { ClerkProvider } from "@clerk/nextjs";
+import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
@@ -26,14 +26,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>
-        <Analytics />
-        <SpeedInsights />
-        <ClerkProvider>
+    <ConvexAuthNextjsServerProvider>
+      <html lang="en">
+        <body>
+          <Analytics />
+          <SpeedInsights />
+
           <ConvexClientProvider>{children}</ConvexClientProvider>
-        </ClerkProvider>
-      </body>
-    </html>
+        </body>
+      </html>
+    </ConvexAuthNextjsServerProvider>
   );
 }

@@ -9,7 +9,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { SignOutButton, useUser } from "@clerk/nextjs";
+import { formatName } from "@/lib/format-name";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 import { Doc } from "../../convex/_generated/dataModel";
 
 export function ProfileDialog({
@@ -19,17 +22,19 @@ export function ProfileDialog({
   children: React.ReactNode;
   collections: Doc<"collections">[];
 }) {
-  const { user } = useUser();
+  const user = useQuery(api.user.currentUser);
+  const { signOut } = useAuthActions();
+
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="rounded-3xl p-4">
-        <div>
-          <DialogTitle>{user?.fullName}</DialogTitle>
-          <DialogDescription>
-            {user?.primaryEmailAddress?.emailAddress}
-          </DialogDescription>
-        </div>
+        {user && (
+          <div>
+            <DialogTitle>{formatName(user)}</DialogTitle>
+            <DialogDescription>{user.email}</DialogDescription>
+          </div>
+        )}
 
         <div className="flex flex-wrap gap-2">
           {collections.map((collection) => (
@@ -41,11 +46,13 @@ export function ProfileDialog({
 
         <DialogFooter>
           <DialogClose asChild>
-            <SignOutButton>
-              <Button variant="destructive" className="rounded-full">
-                Sign out
-              </Button>
-            </SignOutButton>
+            <Button
+              variant="destructive"
+              className="rounded-full"
+              onClick={signOut}
+            >
+              Sign out
+            </Button>
           </DialogClose>
 
           <DialogClose asChild>

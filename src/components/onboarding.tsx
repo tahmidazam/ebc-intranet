@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { useMobileOS } from "@/hooks/use-mobile-os";
 import { useStandalone } from "@/hooks/use-standalone";
 import { cn } from "@/lib/utils";
-import { SignInButton } from "@clerk/nextjs";
 import { CircleCheckIcon, CircleIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -149,9 +148,9 @@ export function Onboarding() {
                 authentication purposes only.
               </p>
 
-              <SignInButton>
-                <Button className="rounded-full">Sign in</Button>
-              </SignInButton>
+              <Button className="rounded-full" asChild>
+                <Link href="/sign-in">Sign in</Link>
+              </Button>
             </AccordionContent>
           </AccordionItem>
         </Accordion>

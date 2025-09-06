@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { cn } from "@/lib/utils";
-import { useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { Loader2Icon, LockIcon, SettingsIcon, UserIcon } from "lucide-react";
 import { useMotionValueEvent, useScroll } from "motion/react";
@@ -20,7 +19,7 @@ export function Home() {
   const isMobile = useIsMobile();
   const { scrollY } = useScroll();
   const [showBorder, setShowBorder] = useState(false);
-  const { user } = useUser();
+  const user = useQuery(api.user.currentUser);
 
   useMotionValueEvent(scrollY, "change", (current) => {
     setShowBorder(current > 0);
@@ -41,7 +40,7 @@ export function Home() {
           <h1 className="font-medium text-2xl tracking-tight">EBC Intranet</h1>
 
           <div className="flex gap-2">
-            {user?.publicMetadata.role === "admin" && (
+            {user?.role === "admin" && (
               <Button variant="outline" size="icon" className="rounded-full">
                 <Link href="/admin/collections">
                   <LockIcon />

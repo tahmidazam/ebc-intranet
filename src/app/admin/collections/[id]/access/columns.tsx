@@ -1,8 +1,9 @@
 import { Checkbox } from "@/components/ui/checkbox";
-import { Member } from "@/schemas/member";
 import { ColumnDef } from "@tanstack/react-table";
+import { Doc } from "../../../../../../convex/_generated/dataModel";
+import { formatName } from "@/lib/format-name";
 
-export const columns: ColumnDef<Member>[] = [
+export const columns: ColumnDef<Doc<"users">>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -27,7 +28,8 @@ export const columns: ColumnDef<Member>[] = [
   },
   {
     header: "Full Name",
-    accessorKey: "fullName",
+    id: "fullName",
+    accessorFn: (row) => formatName(row),
     meta: {
       className: "w-full",
     },

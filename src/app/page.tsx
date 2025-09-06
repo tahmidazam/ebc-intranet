@@ -2,17 +2,17 @@
 
 import { Home } from "@/components/home";
 import { Onboarding } from "@/components/onboarding";
-import { SignedIn, SignedOut } from "@clerk/nextjs";
+import { Authenticated, Unauthenticated } from "convex/react";
 
 export default function Page() {
   return (
     <>
-      <SignedIn>
+      <Authenticated>
         <Home />
-      </SignedIn>
-      <SignedOut>
+      </Authenticated>
+      <Unauthenticated>
         <Onboarding />
-      </SignedOut>
+      </Unauthenticated>
     </>
   );
 }

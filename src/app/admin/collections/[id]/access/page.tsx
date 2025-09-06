@@ -20,8 +20,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useMembers } from "@/hooks/use-members";
-import { mergeMembers } from "@/lib/merge-members";
 import { noResultsText } from "@/lib/no-results-text";
 import {
   ColumnFiltersState,
@@ -38,29 +36,23 @@ import { Id } from "../../../../../../convex/_generated/dataModel";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+
   const collection = useQuery(api.collections.getById, {
     id: id as Id<"collections">,
   });
-  const collectionClerkIds = useQuery(
-    api.collectionMembers.getCollectionClerkIds,
+  const collectionUserIds = useQuery(
+    api.collectionMembers.getCollectionUserIds,
     {
       collectionId: id as Id<"collections">,
     }
   );
-  const { data: clerkMembers, isLoading } = useMembers();
-
-  const convexMembers = useQuery(api.collectionMembers.getUserCollectionIds);
-  const clerkIds = useQuery(api.collectionMembers.getCollectionClerkIds, {
+  const userIds = useQuery(api.collectionMembers.getCollectionUserIds, {
     collectionId: id as Id<"collections">,
   });
   const updateCollectionAccess = useMutation(
     api.collectionMembers.updateCollectionAccess
   );
-
-  const members = useMemo(
-    () => mergeMembers(clerkMembers, convexMembers),
-    [clerkMembers, convexMembers]
-  );
+  const members = useQuery(api.user.collectWithCollectionIds);
 
   const [rowSelection, setRowSelection] = useState({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -79,29 +71,29 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   });
 
   useEffect(() => {
-    if (clerkIds) {
+    if (userIds) {
       const selectedRows: Record<string, boolean> = {};
       table.getRowModel().rows.forEach((row) => {
-        if (clerkIds.includes(row.original.id)) {
+        if (userIds.includes(row.original._id)) {
           selectedRows[row.id] = true;
         }
       });
       setRowSelection(selectedRows);
     }
-  }, [members, clerkIds, table]);
+  }, [members, userIds, table]);
 
   const changes = useMemo(() => {
     const setA = new Set(
-      table.getSelectedRowModel().rows.map((r) => r.original.id)
+      table.getSelectedRowModel().rows.map((r) => r.original._id)
     );
-    const setB = new Set(collectionClerkIds);
+    const setB = new Set(collectionUserIds);
 
     return setA.size !== setB.size || [...setA].some((id) => !setB.has(id));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rowSelection, collectionClerkIds, table]);
+  }, [rowSelection, collectionUserIds, table]);
 
-  if (isLoading || !members || !collection || !collectionClerkIds)
+  if (!members || !collection || !collectionUserIds)
     return (
       <main className="flex items-center justify-center h-screen w-full">
         <Loader2Icon className="animate-spin" />
@@ -152,9 +144,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             onClick={() => {
               updateCollectionAccess({
                 collectionId: id as Id<"collections">,
-                clerkIds: table
+                userIds: table
                   .getSelectedRowModel()
-                  .rows.map((r) => r.original.id),
+                  .rows.map((r) => r.original._id),
               });
             }}
             disabled={!changes}

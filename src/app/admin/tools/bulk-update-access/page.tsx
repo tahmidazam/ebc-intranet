@@ -24,7 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useMembers } from "@/hooks/use-members";
+import { formatName } from "@/lib/format-name";
 import { useMutation, useQuery } from "convex/react";
 import { Loader2Icon, PlusIcon } from "lucide-react";
 import { useState } from "react";
@@ -33,7 +33,7 @@ import { Id } from "../../../../../convex/_generated/dataModel";
 
 export default function Page() {
   const collections = useQuery(api.collections.get);
-  const { data: clerkMembers, isLoading } = useMembers();
+  const members = useQuery(api.user.collectWithCollectionIds);
   const updateAccessToCollectionsForGroup = useMutation(
     api.collectionMembers.updateAccessToCollectionsForGroup
   );
@@ -56,11 +56,11 @@ export default function Page() {
       )
     : [];
 
-  const selectableMembers = clerkMembers
-    ? clerkMembers.filter((member) => !selectedClerkIds.includes(member.id))
+  const selectableMembers = members
+    ? members.filter((member) => !selectedClerkIds.includes(member._id))
     : [];
 
-  if (!collections || isLoading || !clerkMembers)
+  if (!collections || !members)
     return (
       <main className="flex items-center justify-center h-screen w-full">
         <Loader2Icon className="animate-spin" />
@@ -95,7 +95,7 @@ export default function Page() {
             className="rounded-full"
             onClick={() => {
               updateAccessToCollectionsForGroup({
-                clerkIds: selectedClerkIds,
+                userIds: selectedClerkIds,
                 collectionIds: selectedCollectionIds as Id<"collections">[],
               });
               setSelectedClerkIds([]);
@@ -124,8 +124,8 @@ export default function Page() {
               </SelectTrigger>
               <SelectContent>
                 {selectableMembers.map((member) => (
-                  <SelectItem key={member.id} value={member.id}>
-                    {member.fullName}
+                  <SelectItem key={member._id} value={member._id}>
+                    {formatName(member)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -154,20 +154,22 @@ export default function Page() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {selectedClerkIds.map((clerkId) => (
-                <TableRow key={clerkId}>
+              {selectedClerkIds.map((userId) => (
+                <TableRow key={userId}>
                   <TableCell className="w-full">
-                    {
-                      clerkMembers.find((member) => member.id === clerkId)
-                        ?.fullName
-                    }
+                    {(() => {
+                      const member = members.find(
+                        (member) => member._id === userId
+                      );
+                      return member ? formatName(member) : null;
+                    })()}
                   </TableCell>
 
                   <TableCell
                     className="underline underline-offset-4 decoration-border cursor-pointer"
                     onClick={() => {
                       setSelectedClerkIds((prev) =>
-                        prev.filter((id) => id !== clerkId)
+                        prev.filter((id) => id !== userId)
                       );
                     }}
                   >

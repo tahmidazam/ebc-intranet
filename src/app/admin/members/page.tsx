@@ -19,8 +19,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useMembers } from "@/hooks/use-members";
-import { mergeMembers } from "@/lib/merge-members";
 import { noResultsText } from "@/lib/no-results-text";
 import {
   ColumnFiltersState,
@@ -35,14 +33,9 @@ import { useMemo, useState } from "react";
 import { api } from "../../../../convex/_generated/api";
 
 export default function Members() {
-  const { data: clerkMembers, isLoading } = useMembers();
-  const convexMembers = useQuery(api.collectionMembers.getUserCollectionIds);
   const collections = useQuery(api.collections.get);
 
-  const members = useMemo(
-    () => mergeMembers(clerkMembers, convexMembers),
-    [clerkMembers, convexMembers]
-  );
+  const members = useQuery(api.user.collectWithCollectionIds);
   const columns = useMemo(() => getColumns(collections ?? []), [collections]);
 
   const [rowSelection, setRowSelection] = useState({});
@@ -61,7 +54,7 @@ export default function Members() {
     },
   });
 
-  if (isLoading || !members || !collections)
+  if (!members || !collections)
     return (
       <main className="flex items-center justify-center h-screen w-full">
         <Loader2Icon className="animate-spin" />

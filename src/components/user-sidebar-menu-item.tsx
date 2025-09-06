@@ -9,16 +9,17 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { SignOutButton, useUser } from "@clerk/nextjs";
+import { useQuery } from "convex/react";
 import { EllipsisVerticalIcon, LogOutIcon } from "lucide-react";
+import { api } from "../../convex/_generated/api";
+import { useAuthActions } from "@convex-dev/auth/react";
 
 export function UserSidebarMenuItem() {
   const { isMobile } = useSidebar();
-  const { isSignedIn, user, isLoaded } = useUser();
+  const { signOut } = useAuthActions();
+  const user = useQuery(api.user.currentUser);
 
-  if (!isLoaded || !isSignedIn) {
-    return null;
-  }
+  if (!user) return null;
 
   return (
     <SidebarMenuItem>
@@ -29,12 +30,12 @@ export function UserSidebarMenuItem() {
             className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           >
             <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-medium">{user.fullName}</span>
-              {user.primaryEmailAddress?.emailAddress && (
-                <span className="text-muted-foreground truncate text-xs">
-                  {user.primaryEmailAddress.emailAddress}
-                </span>
-              )}
+              <span className="truncate font-medium">
+                {[user.firstName, user.lastName].filter(Boolean).join(" ")}
+              </span>
+              <span className="text-muted-foreground truncate text-xs">
+                {user.email}
+              </span>
             </div>
             <EllipsisVerticalIcon className="ml-auto size-4" />
           </SidebarMenuButton>
@@ -45,12 +46,10 @@ export function UserSidebarMenuItem() {
           align="end"
           sideOffset={4}
         >
-          <SignOutButton>
-            <DropdownMenuItem>
-              <LogOutIcon />
-              Log out
-            </DropdownMenuItem>
-          </SignOutButton>
+          <DropdownMenuItem onClick={signOut}>
+            <LogOutIcon />
+            Log out
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </SidebarMenuItem>

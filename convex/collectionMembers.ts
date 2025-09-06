@@ -7,20 +7,30 @@ export const getUserCollectionIds = query({
 
     const byUser: Record<string, string[]> = {};
     for (const m of memberships) {
-      if (!byUser[m.clerkId]) {
-        byUser[m.clerkId] = [];
+      if (!byUser[m.userId]) {
+        byUser[m.userId] = [];
       }
-      byUser[m.clerkId].push(m.collectionId);
+      byUser[m.userId].push(m.collectionId);
     }
 
-    return Object.entries(byUser).map(([clerkId, collectionIds]) => ({
-      clerkId,
+    return Object.entries(byUser).map(([userId, collectionIds]) => ({
+      userId,
       collectionIds,
     }));
   },
 });
 
-export const getCollectionClerkIds = query({
+export const insert = mutation({
+  args: {
+    userId: v.string(),
+    collectionId: v.id("collections"),
+  },
+  handler: async (ctx, { userId, collectionId }) => {
+    await ctx.db.insert("collectionMembers", { userId, collectionId });
+  },
+});
+
+export const getCollectionUserIds = query({
   args: {
     collectionId: v.id("collections"),
   },
@@ -30,32 +40,32 @@ export const getCollectionClerkIds = query({
       .withIndex("collectionId", (q) => q.eq("collectionId", collectionId))
       .collect();
 
-    return memberships.map((m) => m.clerkId);
+    return memberships.map((m) => m.userId);
   },
 });
 
 export const updateCollectionAccess = mutation({
   args: {
     collectionId: v.id("collections"),
-    clerkIds: v.array(v.string()),
+    userIds: v.array(v.string()),
   },
-  handler: async (ctx, { collectionId, clerkIds }) => {
+  handler: async (ctx, { collectionId, userIds }) => {
     const existingMemberships = await ctx.db
       .query("collectionMembers")
       .withIndex("collectionId", (q) => q.eq("collectionId", collectionId))
       .collect();
 
-    const existingIds = new Set(existingMemberships.map((m) => m.clerkId));
-    const desiredIds = new Set(clerkIds);
+    const existingIds = new Set(existingMemberships.map((m) => m.userId));
+    const desiredIds = new Set(userIds);
 
-    for (const clerkId of desiredIds) {
-      if (!existingIds.has(clerkId)) {
-        await ctx.db.insert("collectionMembers", { clerkId, collectionId });
+    for (const userId of desiredIds) {
+      if (!existingIds.has(userId)) {
+        await ctx.db.insert("collectionMembers", { userId, collectionId });
       }
     }
 
     for (const membership of existingMemberships) {
-      if (!desiredIds.has(membership.clerkId)) {
+      if (!desiredIds.has(membership.userId)) {
         await ctx.db.delete(membership._id);
       }
     }
@@ -64,21 +74,21 @@ export const updateCollectionAccess = mutation({
 
 export const updateAccessToCollectionsForGroup = mutation({
   args: {
-    clerkIds: v.array(v.string()),
+    userIds: v.array(v.string()),
     collectionIds: v.array(v.id("collections")),
   },
-  handler: async (ctx, { clerkIds, collectionIds }) => {
-    for (const clerkId of clerkIds) {
+  handler: async (ctx, { userIds, collectionIds }) => {
+    for (const userId of userIds) {
       for (const collectionId of collectionIds) {
         const existing = await ctx.db
           .query("collectionMembers")
-          .withIndex("clerkId_collectionId", (q) =>
-            q.eq("clerkId", clerkId).eq("collectionId", collectionId)
+          .withIndex("userId_collectionId", (q) =>
+            q.eq("userId", userId).eq("collectionId", collectionId)
           )
           .first();
 
         if (!existing) {
-          await ctx.db.insert("collectionMembers", { clerkId, collectionId });
+          await ctx.db.insert("collectionMembers", { userId, collectionId });
         }
       }
     }

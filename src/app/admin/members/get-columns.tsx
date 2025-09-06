@@ -1,32 +1,33 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Member } from "@/schemas/member";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 import { Doc, Id } from "../../../../convex/_generated/dataModel";
+import { formatName } from "@/lib/format-name";
 
 export const getColumns = (
   collections: Doc<"collections">[]
-): ColumnDef<Member>[] => {
+): ColumnDef<Doc<"users"> & { collectionIds: string[] }>[] => {
   const collectionMap = new Map(collections.map((col) => [col._id, col]));
 
   return [
     {
       header: "Full Name",
-      accessorKey: "fullName",
+      id: "fullName",
+      accessorFn: (row) => formatName(row),
     },
     {
       id: "admin",
       cell: (params) => {
-        if (!params.row.original.admin) return null;
+        if (params.row.original.role !== "admin") return null;
 
         return <Badge variant="outline">Admin</Badge>;
       },
     },
     {
       header: "Email",
-      accessorKey: "emailAddress",
+      accessorKey: "email",
     },
     {
       header: "Collections",

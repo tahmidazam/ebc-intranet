@@ -10,10 +10,13 @@ import {
 } from "@/components/ui/drawer";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { formatName } from "@/lib/format-name";
 import { useIntranetStore } from "@/lib/store";
-import { SignOutButton, useUser } from "@clerk/nextjs";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { useQuery } from "convex/react";
 import { XIcon } from "lucide-react";
 import { useShallow } from "zustand/shallow";
+import { api } from "../../convex/_generated/api";
 import { Doc } from "../../convex/_generated/dataModel";
 
 export function PreferencesDrawer({
@@ -23,7 +26,8 @@ export function PreferencesDrawer({
   children: React.ReactNode;
   collections: Doc<"collections">[];
 }) {
-  const { user } = useUser();
+  const user = useQuery(api.user.currentUser);
+  const { signOut } = useAuthActions();
   const showEmptyCollections = useIntranetStore(
     useShallow((state) => state.showEmptyCollections)
   );
@@ -70,12 +74,12 @@ export function PreferencesDrawer({
 
         <div className="p-4 flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <div>
-              <p>{user?.fullName}</p>
-              <p className="text-sm text-muted-foreground">
-                {user?.primaryEmailAddress?.emailAddress}
-              </p>
-            </div>
+            {user && (
+              <div>
+                <p>{formatName(user)}</p>
+                <p className="text-sm text-muted-foreground">{user.email}</p>
+              </div>
+            )}
 
             <div className="flex items-center flex-wrap gap-2">
               {collections.map((collection) => (
@@ -87,11 +91,13 @@ export function PreferencesDrawer({
           </div>
 
           <DrawerClose asChild>
-            <SignOutButton>
-              <Button className="rounded-full" variant="outline">
-                Sign out
-              </Button>
-            </SignOutButton>
+            <Button
+              className="rounded-full"
+              variant="outline"
+              onClick={signOut}
+            >
+              Sign out
+            </Button>
           </DrawerClose>
         </div>
 
