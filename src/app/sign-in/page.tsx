@@ -9,9 +9,9 @@ import {
 } from "@/components/ui/input-otp";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useConvex } from "convex/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
-import { useRouter } from "next/navigation";
 
 export default function SignIn() {
   const convex = useConvex();
@@ -115,6 +115,11 @@ export default function SignIn() {
             </InputOTPGroup>
           </InputOTP>
         </div>
+
+        <p className="text-sm text-muted-foreground text-center text-balance">
+          Didn't get the email? Please check your junk folder in case it landed
+          there.
+        </p>
 
         <input name="email" value={step.email} type="hidden" />
 
