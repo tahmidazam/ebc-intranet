@@ -117,8 +117,8 @@ export default function SignIn() {
         </div>
 
         <p className="text-sm text-muted-foreground text-center text-balance">
-          Didn't get the email? Please check your junk folder in case it landed
-          there.
+          Didn&apos;t get the email? Please check your junk folder in case it
+          landed there.
         </p>
 
         <input name="email" value={step.email} type="hidden" />
