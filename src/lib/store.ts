@@ -10,6 +10,8 @@ interface IntranetState {
   setShowCollectionInPinnedLinks: (value: boolean) => void;
   keepCollectionsCollapsed: boolean;
   setKeepCollectionsCollapsed: (value: boolean) => void;
+  onlyShowPinnedLinks: boolean;
+  setOnlyShowPinnedLinks: (value: boolean) => void;
 }
 
 export const useIntranetStore = create<IntranetState>()(
@@ -31,6 +33,9 @@ export const useIntranetStore = create<IntranetState>()(
       keepCollectionsCollapsed: false,
       setKeepCollectionsCollapsed: (value: boolean) =>
         set({ keepCollectionsCollapsed: value }),
+      onlyShowPinnedLinks: false,
+      setOnlyShowPinnedLinks: (value: boolean) =>
+        set({ onlyShowPinnedLinks: value }),
     }),
     {
       name: "intranet-store",

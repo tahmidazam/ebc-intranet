@@ -36,6 +36,12 @@ export function Preferences({
   const setKeepCollectionsCollapsed = useIntranetStore(
     useShallow((state) => state.setKeepCollectionsCollapsed)
   );
+  const onlyShowPinnedLinks = useIntranetStore(
+    useShallow((state) => state.onlyShowPinnedLinks)
+  );
+  const setOnlyShowPinnedLinks = useIntranetStore(
+    useShallow((state) => state.setOnlyShowPinnedLinks)
+  );
 
   return (
     <>
@@ -101,6 +107,17 @@ export function Preferences({
           />
           <Label htmlFor="collections-collapsed-by-default">
             <p>Keep Collections Collapsed</p>
+          </Label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="only-show-pinned-links"
+            checked={onlyShowPinnedLinks}
+            onCheckedChange={setOnlyShowPinnedLinks}
+          />
+          <Label htmlFor="only-show-pinned-links">
+            <p>Only Show Pinned Links</p>
           </Label>
         </div>
       </div>

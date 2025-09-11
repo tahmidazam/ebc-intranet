@@ -26,6 +26,9 @@ export function CollectionsList({
   const showCollectionInPinnedLinks = useIntranetStore(
     useShallow((state) => state.showCollectionInPinnedLinks)
   );
+  const onlyShowPinnedLinks = useIntranetStore(
+    useShallow((state) => state.onlyShowPinnedLinks)
+  );
 
   const pinnedLinkIds = useIntranetStore(
     useShallow((state) => state.pinnedLinkIds)
@@ -67,19 +70,20 @@ export function CollectionsList({
         </>
       )}
 
-      {collections
-        .filter((collection) => {
-          if (!showEmptyCollections) {
-            return collection.links.length > 0;
-          }
-          return true;
-        })
-        .map((collection) => (
-          <CollectionsListSection
-            key={collection._id}
-            collection={collection}
-          />
-        ))}
+      {!onlyShowPinnedLinks &&
+        collections
+          .filter((collection) => {
+            if (!showEmptyCollections) {
+              return collection.links.length > 0;
+            }
+            return true;
+          })
+          .map((collection) => (
+            <CollectionsListSection
+              key={collection._id}
+              collection={collection}
+            />
+          ))}
     </div>
   );
 }
