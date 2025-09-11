@@ -1,14 +1,29 @@
 "use client";
 
 import { CollectionsList } from "@/components/collections-list";
-import { PreferencesDrawer } from "@/components/preferences-drawer";
-import { ProfileDialog } from "@/components/profile-dialog";
+import { Preferences } from "@/components/preferences";
 import { Button } from "@/components/ui/button";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
-import { Loader2Icon, LockIcon, SettingsIcon, UserIcon } from "lucide-react";
+import { Loader2Icon, LockIcon, SettingsIcon, XIcon } from "lucide-react";
 import { useMotionValueEvent, useScroll } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
@@ -48,11 +63,24 @@ export function Home() {
               </Button>
             )}
 
-            <ProfileDialog collections={collections}>
-              <Button variant="outline" size="icon" className="rounded-full">
-                <UserIcon />
-              </Button>
-            </ProfileDialog>
+            <Sheet>
+              <SheetTrigger>
+                <Button variant="outline" size="icon" className="rounded-full">
+                  <SettingsIcon />
+                </Button>
+              </SheetTrigger>
+
+              <SheetContent className="gap-0">
+                <SheetHeader>
+                  <SheetTitle>Preferences</SheetTitle>
+                  <SheetDescription className="sr-only">
+                    Manage your profile and view preferences.
+                  </SheetDescription>
+                </SheetHeader>
+
+                <Preferences collections={collections} />
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
 
@@ -79,11 +107,37 @@ export function Home() {
               EBC Intranet
             </h1>
 
-            <PreferencesDrawer collections={collections}>
-              <Button variant="outline" size="icon" className="rounded-full">
-                <SettingsIcon />
-              </Button>
-            </PreferencesDrawer>
+            <Drawer>
+              <DrawerTrigger asChild>
+                <Button variant="outline" size="icon" className="rounded-full">
+                  <SettingsIcon />
+                </Button>
+              </DrawerTrigger>
+              <DrawerContent
+                style={{
+                  paddingBottom: "env(safe-area-inset-bottom)",
+                  height: "calc(100vh - env(safe-area-inset-top))",
+                }}
+              >
+                <DrawerHeader className="flex flex-row items-center justify-between">
+                  <DrawerTitle className="font-medium text-2xl tracking-tight">
+                    Preferences
+                  </DrawerTitle>
+
+                  <DrawerClose asChild>
+                    <Button
+                      className="rounded-full"
+                      variant="outline"
+                      size="icon"
+                    >
+                      <XIcon />
+                    </Button>
+                  </DrawerClose>
+                </DrawerHeader>
+
+                <Preferences collections={collections} />
+              </DrawerContent>
+            </Drawer>
           </div>
 
           <Separator
