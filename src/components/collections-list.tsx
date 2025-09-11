@@ -7,6 +7,7 @@ import {
   PinIcon,
   PinOffIcon,
 } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useShallow } from "zustand/shallow";
@@ -18,14 +19,16 @@ export function CollectionsList({
   collections: (Doc<"collections"> & { links: Doc<"links">[] })[];
 }) {
   const os = useMobileOS();
-  const pinnedLinkIds = useIntranetStore(
-    useShallow((state) => state.pinnedLinkIds)
-  );
+
   const showEmptyCollections = useIntranetStore(
     useShallow((state) => state.showEmptyCollections)
   );
   const showCollectionInPinnedLinks = useIntranetStore(
     useShallow((state) => state.showCollectionInPinnedLinks)
+  );
+
+  const pinnedLinkIds = useIntranetStore(
+    useShallow((state) => state.pinnedLinkIds)
   );
 
   const pinnedLinks: (Doc<"links"> & { collection: Doc<"collections"> })[] =
@@ -107,19 +110,29 @@ function CollectionsListSection({
         </button>
       </div>
 
-      {open &&
-        collection.links.map((link) => (
-          <div key={link._id} className="flex hover:bg-muted/50 border-b">
-            <Link
-              className="py-2 px-4 align-middle whitespace-nowrap grow"
-              href={transformMobileUrl(link.url, os)}
-            >
-              {link.title}
-            </Link>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {collection.links.map((link) => (
+              <div key={link._id} className="flex hover:bg-muted/50 border-b">
+                <Link
+                  className="py-2 px-4 align-middle whitespace-nowrap grow"
+                  href={transformMobileUrl(link.url, os)}
+                >
+                  {link.title}
+                </Link>
 
-            <TogglePinButton link={link} />
-          </div>
-        ))}
+                <TogglePinButton link={link} />
+              </div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
