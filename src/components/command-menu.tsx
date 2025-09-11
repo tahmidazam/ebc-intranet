@@ -1,6 +1,6 @@
 "use client";
 
-import { LockIcon, SearchIcon } from "lucide-react";
+import { LinkIcon, LockIcon, SearchIcon } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -68,6 +68,7 @@ export function CommandMenu({
                       setOpen(false);
                     }}
                   >
+                    <LinkIcon />
                     <span>{link.title}</span>
                   </CommandItem>
                 ))}
