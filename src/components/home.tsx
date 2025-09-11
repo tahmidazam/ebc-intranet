@@ -1,6 +1,7 @@
 "use client";
 
 import { CollectionsList } from "@/components/collections-list";
+import { CommandMenu } from "@/components/command-menu";
 import { Preferences } from "@/components/preferences";
 import { Button } from "@/components/ui/button";
 import {
@@ -55,6 +56,11 @@ export function Home() {
           <h1 className="font-medium text-2xl tracking-tight">EBC Intranet</h1>
 
           <div className="flex gap-2">
+            <CommandMenu
+              collections={collections}
+              isAdmin={user?.role === "admin"}
+            />
+
             {user?.role === "admin" && (
               <Button variant="outline" size="icon" className="rounded-full">
                 <Link href="/admin/collections">
@@ -64,7 +70,7 @@ export function Home() {
             )}
 
             <Sheet>
-              <SheetTrigger>
+              <SheetTrigger asChild>
                 <Button variant="outline" size="icon" className="rounded-full">
                   <SettingsIcon />
                 </Button>
