@@ -11,6 +11,18 @@ export default defineSchema({
     emailVerificationTime: v.optional(v.number()),
     isAnonymous: v.optional(v.boolean()),
     role: v.optional(v.string()),
+    sidePreference: v.optional(
+      v.union(
+        v.literal("strokeside"),
+        v.literal("bowside"),
+        v.literal("bisweptual"),
+        v.literal("N/A"),
+        v.literal("unknown")
+      )
+    ),
+    cox: v.optional(v.boolean()),
+    novice: v.optional(v.boolean()),
+    availabilities: v.optional(v.record(v.string(), v.string())),
   }).index("email", ["email"]),
   collections: defineTable({
     title: v.string(),

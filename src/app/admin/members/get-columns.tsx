@@ -5,6 +5,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 import { Doc, Id } from "../../../../convex/_generated/dataModel";
 import { formatName } from "@/lib/format-name";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export const getColumns = (
   collections: Doc<"collections">[]
@@ -28,6 +29,31 @@ export const getColumns = (
     {
       header: "Email",
       accessorKey: "email",
+    },
+    {
+      header: "Side Preference",
+      accessorKey: "sidePreference",
+      cell: (params) => {
+        if (!params.row.original.sidePreference) return null;
+
+        return (
+          <Badge variant="outline">{params.row.original.sidePreference}</Badge>
+        );
+      },
+    },
+    {
+      header: "Cox",
+      accessorKey: "cox",
+      cell: (params) => {
+        return <Checkbox checked={params.row.original.cox} />;
+      },
+    },
+    {
+      header: "Novice",
+      accessorKey: "novice",
+      cell: (params) => {
+        return <Checkbox checked={params.row.original.novice} />;
+      },
     },
     {
       header: "Collections",

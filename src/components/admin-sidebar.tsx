@@ -13,7 +13,14 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { UserSidebarMenuItem } from "@/components/user-sidebar-menu-item";
-import { ChevronLeft, FolderGit, Grid3x2, Library, Users2 } from "lucide-react";
+import {
+  ChevronLeft,
+  FolderGit,
+  FolderSyncIcon,
+  Grid3x2,
+  Library,
+  Users2,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -35,6 +42,11 @@ const tools = [
     title: "Bulk Update Access",
     href: "/admin/tools/bulk-update-access",
     icon: Grid3x2,
+  },
+  {
+    title: "Sync Members",
+    href: "/admin/tools/sync-members",
+    icon: FolderSyncIcon,
   },
 ];
 

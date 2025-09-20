@@ -5,6 +5,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { forbidden } from "next/navigation";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function AdminLayout({
   children,
@@ -19,6 +20,7 @@ export default function AdminLayout({
 
   return (
     <SidebarProvider>
+      <Toaster />
       <AdminSidebar />
 
       {children}
