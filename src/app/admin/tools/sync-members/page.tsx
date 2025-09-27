@@ -91,21 +91,27 @@ export default function SyncMembersPage() {
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-8 p-4 max-w-4xl mx-auto w-full">
-          <div className="flex flex-col gap-4">
-            <p className="text-sm text-muted-foreground text-pretty">
+          <div className="flex flex-col gap-4 text-sm text-muted-foreground text-pretty">
+            <p>
               This tool allows you to sync members from a Google Sheet to update
               their cox status, novice status, side preference, and
               availabilities.
             </p>
 
-            <p className="text-sm text-muted-foreground text-pretty">
+            <p>
               If members (matched by email address) already exist, their
               information will be updated; otherwise, new member accounts will
               be created with the information from the sheet. No members will be
               deleted.
             </p>
 
-            <p className="text-sm text-muted-foreground text-pretty">
+            <p>
+              Reading from the sheet can fail if the data validation is not
+              respected. Ensure values are set for side preferences, and ensure
+              availabilities strictly follow the format outlined.
+            </p>
+
+            <p>
               Note that new members created via this syncing process will not be
               automatically added to any collections. Use the{" "}
               <Link

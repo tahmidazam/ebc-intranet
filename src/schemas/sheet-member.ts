@@ -1,13 +1,5 @@
 import { z } from "zod";
-
-const SIDE_PREFERENCE_CASES = [
-  "strokeside",
-  "bowside",
-  "bisweptual",
-  "N/A",
-  "unknown",
-] as const;
-const sidePreferenceEnum = z.enum(SIDE_PREFERENCE_CASES);
+import { sidePreferenceEnum } from "./side-preference";
 
 export const sheetMemberSchema = z.object({
   crsid: z.string(),
