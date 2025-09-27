@@ -15,7 +15,6 @@ import {
 import { UserSidebarMenuItem } from "@/components/user-sidebar-menu-item";
 import {
   ChevronLeft,
-  ClockIcon,
   FolderGit,
   FolderSyncIcon,
   Grid3x2,
@@ -48,11 +47,6 @@ const tools = [
     title: "Sync Members",
     href: "/admin/tools/sync-members",
     icon: FolderSyncIcon,
-  },
-  {
-    title: "Resolve Availabilities",
-    href: "/admin/tools/resolve-availabilities",
-    icon: ClockIcon,
   },
 ];
 

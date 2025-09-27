@@ -22,9 +22,16 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-is-mobile";
+import { capitalise } from "@/lib/capitalise";
 import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
-import { Loader2Icon, LockIcon, SettingsIcon, XIcon } from "lucide-react";
+import {
+  CalendarSync,
+  Loader2Icon,
+  LockIcon,
+  SettingsIcon,
+  XIcon,
+} from "lucide-react";
 import { useMotionValueEvent, useScroll } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
@@ -100,7 +107,7 @@ export function Home() {
       <div className="fixed top-0 w-full">
         <nav>
           <div
-            className="flex items-center justify-between pb-2 bg-background/10 backdrop-blur-2xl"
+            className="flex flex-col pb-2 gap-2 bg-background/10 backdrop-blur-3xl w-full"
             style={{
               paddingTop: "calc(var(--spacing) * 2 + env(safe-area-inset-top))",
               paddingLeft:
@@ -109,41 +116,69 @@ export function Home() {
                 "calc(var(--spacing) * 4 + env(safe-area-inset-right))",
             }}
           >
-            <h1 className="font-medium text-2xl tracking-tight">
-              EBC Intranet
-            </h1>
+            <div className="flex items-center justify-between">
+              <Button variant="outline" size="icon" className="rounded-full">
+                <Link href={`webcal://localhost:3000/api/cal/${user?._id}`}>
+                  <CalendarSync />
+                </Link>
+              </Button>
 
-            <Drawer>
-              <DrawerTrigger asChild>
-                <Button variant="outline" size="icon" className="rounded-full">
-                  <SettingsIcon />
-                </Button>
-              </DrawerTrigger>
-              <DrawerContent
-                style={{
-                  paddingBottom: "env(safe-area-inset-bottom)",
-                  height: "calc(100vh - env(safe-area-inset-top))",
-                }}
+              <div
+                className={cn(
+                  "flex flex-col items-center transition-opacity duration-200"
+                )}
               >
-                <DrawerHeader className="flex flex-row items-center justify-between">
-                  <DrawerTitle className="font-medium text-2xl tracking-tight">
-                    Preferences
-                  </DrawerTitle>
+                <h1 className="font-medium tracking-tight">EBC Intranet</h1>
+                <p className="text-muted-foreground text-xs">
+                  {[
+                    user?.email.split("@")[0],
+                    user?.sidePreference
+                      ? capitalise(user.sidePreference)
+                      : undefined,
+                    user?.cox ? "cox" : undefined,
+                    user?.role === "admin" ? "Admin" : undefined,
+                  ]
+                    .filter((item) => item != undefined)
+                    .join(" · ")}
+                </p>
+              </div>
 
-                  <DrawerClose asChild>
-                    <Button
-                      className="rounded-full"
-                      variant="outline"
-                      size="icon"
-                    >
-                      <XIcon />
-                    </Button>
-                  </DrawerClose>
-                </DrawerHeader>
+              <Drawer>
+                <DrawerTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="rounded-full"
+                  >
+                    <SettingsIcon />
+                  </Button>
+                </DrawerTrigger>
+                <DrawerContent
+                  style={{
+                    paddingBottom: "env(safe-area-inset-bottom)",
+                    height: "calc(100vh - env(safe-area-inset-top))",
+                  }}
+                >
+                  <DrawerHeader className="flex flex-row items-center justify-between">
+                    <DrawerTitle className="font-medium text-2xl tracking-tight">
+                      Preferences
+                    </DrawerTitle>
 
-                <Preferences collections={collections} />
-              </DrawerContent>
-            </Drawer>
+                    <DrawerClose asChild>
+                      <Button
+                        className="rounded-full"
+                        variant="outline"
+                        size="icon"
+                      >
+                        <XIcon />
+                      </Button>
+                    </DrawerClose>
+                  </DrawerHeader>
+
+                  <Preferences collections={collections} />
+                </DrawerContent>
+              </Drawer>
+            </div>
           </div>
 
           <Separator

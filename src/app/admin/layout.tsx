@@ -6,6 +6,9 @@ import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { forbidden } from "next/navigation";
 import { Toaster } from "@/components/ui/sonner";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 export default function AdminLayout({
   children,
@@ -22,8 +25,10 @@ export default function AdminLayout({
     <SidebarProvider>
       <Toaster />
       <AdminSidebar />
-
-      {children}
+      <QueryClientProvider client={queryClient}>
+        {" "}
+        {children}
+      </QueryClientProvider>
     </SidebarProvider>
   );
 }

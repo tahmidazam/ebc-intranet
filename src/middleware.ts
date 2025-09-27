@@ -6,9 +6,12 @@ import {
 
 const isPublicRoute = createRouteMatcher(["/", "/sign-in(.*)"]);
 const isSignInRouter = createRouteMatcher(["/sign-in(.*)"]);
+const isApiRoute = createRouteMatcher(["/api(.*)"]);
 
 export default convexAuthNextjsMiddleware(
   async (request, { convexAuth }) => {
+    if (isApiRoute(request)) return;
+    
     if (!isPublicRoute(request) && !(await convexAuth.isAuthenticated())) {
       return nextjsMiddlewareRedirect(request, "/sign-in");
     }

@@ -39,4 +39,36 @@ export default defineSchema({
     .index("userId", ["userId"])
     .index("collectionId", ["collectionId"])
     .index("userId_collectionId", ["userId", "collectionId"]),
+  sessions: defineTable({
+    timestamp: v.number(),
+    duration: v.number(),
+    type: v.union(v.literal("water"), v.literal("land")),
+    outline: v.string(),
+    collectionId: v.id("collections"),
+    boat: v.string(),
+    configuration: v.union(v.literal("8+"), v.literal("4+")),
+    course: v.string(),
+    distance: v.number(),
+    coach: v.string(),
+    cox: v.optional(v.id("users")),
+    stroke: v.optional(v.id("users")),
+    seven: v.optional(v.id("users")),
+    six: v.optional(v.id("users")),
+    five: v.optional(v.id("users")),
+    four: v.optional(v.id("users")),
+    three: v.optional(v.id("users")),
+    two: v.optional(v.id("users")),
+    bow: v.optional(v.id("users")),
+  })
+    .index("collectionId", ["collectionId"])
+    .index("cox", ["cox"])
+    .index("stroke", ["stroke"])
+    .index("seven", ["seven"])
+    .index("six", ["six"])
+    .index("five", ["five"])
+    .index("four", ["four"])
+    .index("three", ["three"])
+    .index("two", ["two"])
+    .index("bow", ["bow"]),
+
 });

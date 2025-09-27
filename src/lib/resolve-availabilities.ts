@@ -40,13 +40,33 @@ function isIntervalFree(busy: Interval[], start: number, end: number): boolean {
   return busy.every(([bStart, bEnd]) => end <= bStart || start >= bEnd);
 }
 
+function sessionsToBusyIntervals(
+  sessions: Doc<"sessions">[],
+  day: Date
+): Interval[] {
+  const dayStr = format(day, "EEE MMM d");
+
+  return sessions
+    .filter((s) => {
+      const sDate = new Date(s.timestamp);
+      return format(sDate, "EEE MMM d") === dayStr;
+    })
+    .map((s) => {
+      const sDate = new Date(s.timestamp);
+      const start = sDate.getHours() * 60 + sDate.getMinutes();
+      const end = start + s.duration;
+      return [start, end] as Interval;
+    });
+}
+
+
 export function resolveAvailabilities(
   users: Doc<"users">[],
+  sessions: Doc<"sessions">[],
   startDate: Date,
   durationMinutes: number
 ): Doc<"users">[] {
   const dayStr = format(startDate, "EEE MMM d");
-  console.log("Checking availabilities for", dayStr);
   const startMinutes = startDate.getHours() * 60 + startDate.getMinutes();
   const endMinutes = startMinutes + durationMinutes;
 
@@ -54,11 +74,27 @@ export function resolveAvailabilities(
     const avStr = user.availabilities?.[dayStr];
     if (!avStr) return false;
 
-    const busyIntervals = parseBusyIntervals(avStr);
-    console.log(
-      `User ${user.firstName} ${user.lastName} busy intervals:`,
-      busyIntervals
+    // Busy from availabilities
+    const busyFromAv = parseBusyIntervals(avStr);
+
+    // Busy from sessions (filter only sessions that involve this user)
+    const userSessions = sessions.filter(
+      (s) =>
+        s.cox === user._id ||
+        s.stroke === user._id ||
+        s.seven === user._id ||
+        s.six === user._id ||
+        s.five === user._id ||
+        s.four === user._id ||
+        s.three === user._id ||
+        s.two === user._id ||
+        s.bow === user._id
     );
-    return isIntervalFree(busyIntervals, startMinutes, endMinutes);
+
+    const busyFromSessions = sessionsToBusyIntervals(userSessions, startDate);
+
+    const allBusy = [...busyFromAv, ...busyFromSessions];
+
+    return isIntervalFree(allBusy, startMinutes, endMinutes);
   });
 }

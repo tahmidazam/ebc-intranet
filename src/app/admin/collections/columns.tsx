@@ -46,6 +46,19 @@ export const columns: ColumnDef<Doc<"collections">>[] = [
     },
   },
   {
+    id: "sessions",
+    cell: ({ row }) => {
+      return (
+        <Link
+          className="underline underline-offset-4 decoration-border"
+          href={`/admin/collections/${row.original._id}/sessions`}
+        >
+          Edit Sessions
+        </Link>
+      );
+    },
+  },
+  {
     id: "access",
     cell: ({ row }) => {
       return (

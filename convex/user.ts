@@ -2,6 +2,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { z } from "zod";
+import { Id } from "./_generated/dataModel";
 
 export const collect = query({
   args: {},
@@ -18,6 +19,23 @@ export const currentUser = query({
       return null;
     }
     return await ctx.db.get(userId);
+  },
+});
+
+export const usersInCollection = query({
+  args: { collectionId: v.id("collections") },
+  handler: async (ctx, { collectionId }) => {
+    const memberships = await ctx.db
+      .query("collectionMembers")
+      .withIndex("collectionId", (q) => q.eq("collectionId", collectionId))
+      .collect();
+
+    const userIds = memberships.map((m) => m.userId as Id<"users">);
+    if (userIds.length === 0) return [];
+
+    // Batch fetch users for efficiency and filter out nulls
+    const users = await Promise.all(userIds.map((id) => ctx.db.get(id)));
+    return users.filter((u): u is NonNullable<typeof u> => !!u);
   },
 });
 
@@ -61,6 +79,13 @@ export const create = mutation({
       lastName,
       role: admin ? "admin" : undefined,
     });
+  },
+});
+
+export const getById = query({
+  args: { id: v.id("users") },
+  handler: async (ctx, { id }) => {
+    return await ctx.db.get(id);
   },
 });
 
