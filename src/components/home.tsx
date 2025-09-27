@@ -118,7 +118,9 @@ export function Home() {
           >
             <div className="flex items-center justify-between">
               <Button variant="outline" size="icon" className="rounded-full">
-                <Link href={`webcal://localhost:3000/api/cal/${user?._id}`}>
+                <Link
+                  href={`webcal://intranet.emmabc.org/api/cal/${user?._id}`}
+                >
                   <CalendarSync />
                 </Link>
               </Button>
