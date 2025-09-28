@@ -5,6 +5,7 @@ import { getGoogleJWT } from "@/lib/get-google-jwt";
 import { format } from "date-fns";
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import { Doc, Id } from "../../convex/_generated/dataModel";
+import { enGB } from "date-fns/locale";
 
 export async function updateSessions(
   sessions: Doc<"sessions">[],
@@ -51,8 +52,8 @@ export async function updateSessions(
 
   await sheet.addRows(
     sessions.map((session) => ({
-      date: format(new Date(session.timestamp), "EEE MMM d"),
-      time: format(new Date(session.timestamp), "HH:mm"),
+      date: format(new Date(session.timestamp), "EEE MMM d", { locale: enGB }),
+      time: format(new Date(session.timestamp), "HH:mm", { locale: enGB }),
       type: session.type,
       duration: session.duration,
       "config.": session.configuration ?? "",
