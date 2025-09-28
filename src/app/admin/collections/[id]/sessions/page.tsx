@@ -19,6 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { noResultsText } from "@/lib/no-results-text";
+import { updateSessions } from "@/server-actions/update-sessions";
 import {
   ColumnFiltersState,
   flexRender,
@@ -27,7 +28,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useQuery } from "convex/react";
-import { Loader2Icon, PlusIcon } from "lucide-react";
+import { FolderSyncIcon, Loader2Icon, PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { use, useMemo, useState } from "react";
 import { api } from "../../../../../../convex/_generated/api";
@@ -104,6 +105,17 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         </div>
 
         <div className="flex flex-row items-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            className="rounded-full"
+            onClick={async () =>
+              await updateSessions(sessions, users, collection.title)
+            }
+          >
+            <FolderSyncIcon />
+          </Button>
+
           <Button variant="outline" size="icon" className="rounded-full">
             <Link href={`/admin/collections/${id}/sessions/new`}>
               <PlusIcon />
