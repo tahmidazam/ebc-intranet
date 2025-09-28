@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import { Doc, Id } from "../../convex/_generated/dataModel";
 import { enGB } from "date-fns/locale";
+import { formatInTimeZone } from "date-fns-tz";
 
 export async function updateSessions(
   sessions: Doc<"sessions">[],
@@ -52,11 +53,18 @@ export async function updateSessions(
 
   await sheet.addRows(
     sessions.map((session) => ({
-      date: format(session.timestamp, "EEE MMM d", { locale: enGB }),
-      time: new Date(session.timestamp).toLocaleTimeString("en-GB", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
+      date: formatInTimeZone(
+        session.timestamp,
+        "Europe/London",
+        "EEE MMM d",
+        { locale: enGB }
+      ),
+      time: formatInTimeZone(
+        session.timestamp,
+        "Europe/London",
+        "HH:mm",
+        { locale: enGB }
+      ),
       type: session.type,
       duration: session.duration,
       "config.": session.configuration ?? "",
