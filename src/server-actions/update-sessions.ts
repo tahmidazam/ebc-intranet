@@ -2,11 +2,10 @@
 
 import { formatName } from "@/lib/format-name";
 import { getGoogleJWT } from "@/lib/get-google-jwt";
-import { format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
+import { enGB } from "date-fns/locale";
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import { Doc, Id } from "../../convex/_generated/dataModel";
-import { enGB } from "date-fns/locale";
-import { formatInTimeZone } from "date-fns-tz";
 
 export async function updateSessions(
   sessions: Doc<"sessions">[],
