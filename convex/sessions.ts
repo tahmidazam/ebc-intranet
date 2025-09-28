@@ -8,13 +8,13 @@ export const insert = mutation({
         duration: v.number(),
         type: v.union(v.literal("water"), v.literal("land")),
         athletes: v.record(v.string(), v.id("users")),
-        outline: v.string(),
+        outline: v.optional(v.string()),
         collectionId: v.id("collections"),
-        boat: v.string(),
+        boat: v.optional(v.string()),
         configuration: v.union(v.literal("8+"), v.literal("4+")),
-        course: v.string(),
-        distance: v.number(),
-        coach: v.string(),
+        course: v.optional(v.string()),
+        distance: v.optional(v.number()),
+        coach: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
         await ctx.db.insert("sessions", {

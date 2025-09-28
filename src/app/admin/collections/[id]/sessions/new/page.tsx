@@ -67,10 +67,13 @@ const COURSE_CASES = [
   },
 ];
 
-const BOATS = ["Spirit (VII)", "IV"];
+const BOATS = [
+  { name: "Phil Turner (VII)", configuration: "8+" },
+  { name: "Paul Collins (IV)", configuration: "4+" },
+  { name: "Rev Reed (IV)", configuration: "4+" },
+];
 
 const SEAT_CASES = ["cox", "stroke", "7", "6", "5", "4", "3", "2", "bow"];
-
 export default function ResolveAvailabilitiesPage({
   params,
 }: {
@@ -104,7 +107,7 @@ export default function ResolveAvailabilitiesPage({
   const [outline, setOutline] = useState("");
   const [type, setType] = useState<"water" | "land">("water");
   const [configuration, setConfiguration] = useState<"8+" | "4+">("8+");
-  const [boat, setBoat] = useState(BOATS[0]);
+  const [boat, setBoat] = useState<string | undefined>(BOATS[0].name);
   const [athletes, setAthletes] = useState<Record<string, Id<"users">>>({});
   const [distance, setDistance] = useState<number>(COURSE_CASES[0].distance);
   const [course, setCourse] = useState(COURSE_CASES[0].label);
@@ -194,21 +197,21 @@ export default function ResolveAvailabilitiesPage({
                 configuration,
                 course,
                 distance,
-                coach: coach ?? "",
+                coach,
                 athletes,
               };
 
               const schema = z.object({
                 timestamp: z.number(),
-                duration: z.number().min(1),
+                duration: z.number(),
                 type: z.enum(["water", "land"]),
-                outline: z.string().min(1),
-                collectionId: z.string().min(1),
-                boat: z.string().min(1),
+                outline: z.string(),
+                collectionId: z.string(),
+                boat: z.string().optional(),
                 configuration: z.enum(["8+", "4+"]),
-                course: z.string().min(1),
-                distance: z.number().min(1),
-                coach: z.string().min(1),
+                course: z.string(),
+                distance: z.number(),
+                coach: z.string().optional(),
                 athletes: z.record(z.string(), z.string()),
               });
 
@@ -220,6 +223,8 @@ export default function ResolveAvailabilitiesPage({
               }
 
               insertSession(dto);
+              toast.success("Session added");
+              setAthletes({});
             }}
           >
             Add Session
@@ -370,14 +375,36 @@ export default function ResolveAvailabilitiesPage({
 
                   <div className="flex flex-col gap-2 w-full">
                     <Label htmlFor="boat">Boat</Label>
-                    <Select value={boat} onValueChange={setBoat}>
+                    <Select
+                      value={boat}
+                      onValueChange={(value) => {
+                        if (value === "undefined") {
+                          setBoat(undefined);
+                          setConfiguration("8+");
+                        } else {
+                          const selectedBoat = BOATS.find(
+                            (b) => b.name === value
+                          );
+                          if (selectedBoat) {
+                            setBoat(selectedBoat.name);
+                            setConfiguration(
+                              selectedBoat.configuration as "8+" | "4+"
+                            );
+                          }
+                        }
+                      }}
+                    >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select boat" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="undefined">No boat</SelectItem>
                         {BOATS.map((boatOption) => (
-                          <SelectItem key={boatOption} value={boatOption}>
-                            {boatOption}
+                          <SelectItem
+                            key={boatOption.name}
+                            value={boatOption.name}
+                          >
+                            {boatOption.name} ({boatOption.configuration})
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -472,7 +499,7 @@ export default function ResolveAvailabilitiesPage({
                 </div>
 
                 <Table>
-                  <TableHeader>
+                  <TableHeader className="sticky top-0 bg-background z-10">
                     <TableRow>
                       <TableHead>Seat</TableHead>
                       <TableHead>Athlete</TableHead>
