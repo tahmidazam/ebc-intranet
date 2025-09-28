@@ -53,7 +53,10 @@ export async function updateSessions(
   await sheet.addRows(
     sessions.map((session) => ({
       date: format(session.timestamp, "EEE MMM d", { locale: enGB }),
-      time: format(session.timestamp, "HH:mm", { locale: enGB }),
+      time: new Date(session.timestamp).toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
       type: session.type,
       duration: session.duration,
       "config.": session.configuration ?? "",
