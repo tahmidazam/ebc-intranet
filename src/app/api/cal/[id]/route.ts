@@ -79,7 +79,7 @@ export async function GET(
     }, {} as Record<string, string>);
 
     // Create calendar
-    const calendar = ical({ name: `${formatName(user)}'s Rowing Sessions` });
+    const calendar = ical({ name: `EBC (${formatName(user)})` });
 
     // Helper function to get user's seat in a session
     const getUserSeat = (session: Doc<"sessions">, userId: string): string | null => {
