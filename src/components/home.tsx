@@ -24,19 +24,13 @@ import {
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { capitalise } from "@/lib/capitalise";
 import { cn } from "@/lib/utils";
-import { getCalendarUrl } from "@/server-actions/get-calendar-url";
 import { useQuery } from "convex/react";
-import {
-  CalendarSync,
-  Loader2Icon,
-  LockIcon,
-  SettingsIcon,
-  XIcon,
-} from "lucide-react";
+import { Loader2Icon, LockIcon, SettingsIcon, XIcon } from "lucide-react";
 import { useMotionValueEvent, useScroll } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
 import { api } from "../../convex/_generated/api";
+import { CalendarSyncButton } from "./calendar-sync-button";
 
 export function Home() {
   const collections = useQuery(api.collections.getUserCollectionsWithLinks);
@@ -49,7 +43,7 @@ export function Home() {
     setShowBorder(current > 0);
   });
 
-  if (!collections) {
+  if (!collections || !user) {
     return (
       <main className="flex items-center justify-center h-screen w-full">
         <Loader2Icon className="animate-spin" />
@@ -118,17 +112,7 @@ export function Home() {
             }}
           >
             <div className="flex items-center justify-between">
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full"
-                onClick={async () => {
-                  const url = await getCalendarUrl(user?._id || "", false);
-                  window.open(url, "_blank", "noopener,noreferrer");
-                }}
-              >
-                <CalendarSync />
-              </Button>
+              <CalendarSyncButton id={user?._id} />
 
               <div
                 className={cn(

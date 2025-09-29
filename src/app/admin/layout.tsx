@@ -2,11 +2,11 @@
 
 import { AdminSidebar } from "@/components/admin-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { useQuery } from "convex/react";
-import { api } from "../../../convex/_generated/api";
-import { forbidden } from "next/navigation";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useQuery } from "convex/react";
+import { forbidden } from "next/navigation";
+import { api } from "../../../convex/_generated/api";
 
 const queryClient = new QueryClient();
 
@@ -25,10 +25,7 @@ export default function AdminLayout({
     <SidebarProvider>
       <Toaster />
       <AdminSidebar />
-      <QueryClientProvider client={queryClient}>
-        {" "}
-        {children}
-      </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </SidebarProvider>
   );
 }
