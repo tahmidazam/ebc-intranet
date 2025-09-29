@@ -15,6 +15,7 @@ import type {
 } from "convex/server";
 import type * as ResendOTP from "../ResendOTP.js";
 import type * as auth from "../auth.js";
+import type * as calendarTokens from "../calendarTokens.js";
 import type * as collectionMembers from "../collectionMembers.js";
 import type * as collections from "../collections.js";
 import type * as http from "../http.js";
@@ -33,6 +34,7 @@ import type * as user from "../user.js";
 declare const fullApi: ApiFromModules<{
   ResendOTP: typeof ResendOTP;
   auth: typeof auth;
+  calendarTokens: typeof calendarTokens;
   collectionMembers: typeof collectionMembers;
   collections: typeof collections;
   http: typeof http;

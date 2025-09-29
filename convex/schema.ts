@@ -71,4 +71,12 @@ export default defineSchema({
     .index("two", ["two"])
     .index("bow", ["bow"])
     .index("coach", ["coach"]),
+  calendarTokens: defineTable({
+    id: v.string(),
+    coach: v.boolean(),
+    token: v.string(),
+  })
+    .index("token", ["token"])
+    .index("id", ["id"])
+    .index("id_coach", ["id", "coach"]),
 });

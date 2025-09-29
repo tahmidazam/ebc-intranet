@@ -24,6 +24,7 @@ import {
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { capitalise } from "@/lib/capitalise";
 import { cn } from "@/lib/utils";
+import { getCalendarUrl } from "@/server-actions/get-calendar-url";
 import { useQuery } from "convex/react";
 import {
   CalendarSync,
@@ -117,12 +118,16 @@ export function Home() {
             }}
           >
             <div className="flex items-center justify-between">
-              <Button variant="outline" size="icon" className="rounded-full">
-                <Link
-                  href={`webcal://intranet.emmabc.org/api/cal/${user?._id}`}
-                >
-                  <CalendarSync />
-                </Link>
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-full"
+                onClick={async () => {
+                  const url = await getCalendarUrl(user?._id || "", false);
+                  window.open(url, "_blank", "noopener,noreferrer");
+                }}
+              >
+                <CalendarSync />
               </Button>
 
               <div

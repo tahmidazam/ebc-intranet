@@ -1,24 +1,48 @@
+import { formatName } from "@/lib/format-name";
 import { sessionsToICalEventData } from "@/lib/sessions-to-ical-event-data";
 import { SEAT_KEYS } from "@/schemas/seat";
 import { fetchQuery } from "convex/nextjs";
 import ical from "ical-generator";
 import { NextResponse } from "next/server";
-import { api } from "../../../../../../convex/_generated/api";
-import { Doc, Id } from "../../../../../../convex/_generated/dataModel";
+import { api } from "../../../../../convex/_generated/api";
+import { Doc, Id } from "../../../../../convex/_generated/dataModel";
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ name: string }> }
+  { params }: { params: Promise<{ token: string }> }
 ) {
-  const { name: encodedName } = await params;
+  const { token } = await params;
 
-  const name = decodeURIComponent(encodedName);
+  console.log(token);
 
   try {
-    // Single query for sessions
-    const sessions = await fetchQuery(api.sessions.getByCoach, {
-      coach: name,
+    const calendarToken = await fetchQuery(api.calendarTokens.resolveToken, {
+      token,
     });
+
+    if (!calendarToken) {
+      return NextResponse.json({ message: "Invalid token" }, { status: 401 });
+    }
+
+    const { id, coach } = calendarToken;
+
+    // Single query for user
+    const user = coach
+      ? null
+      : await fetchQuery(api.user.getById, {
+          id: id as Id<"users">,
+        });
+
+    if (!user && !coach) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    // Single query for sessions
+    const sessions = coach
+      ? await fetchQuery(api.sessions.getByCoach, { coach: id })
+      : await fetchQuery(api.sessions.getByUser, {
+          userId: id as Id<"users">,
+        });
 
     if (!sessions?.length) {
       return NextResponse.json(
@@ -60,8 +84,9 @@ export async function GET(
       ),
     ]);
 
+    const formattedName = coach ? id : user ? formatName(user) : "Unknown";
     // Create calendar
-    const calendar = ical({ name: `EBC (${name})` });
+    const calendar = ical({ name: `EBC (${formattedName})` });
 
     // Convert sessions to events using the extracted function
     const events = sessionsToICalEventData(
@@ -69,7 +94,8 @@ export async function GET(
       usersArray.filter((user): user is Doc<"users"> => user !== null),
       collectionsArray.filter(
         (collection): collection is Doc<"collections"> => collection !== null
-      )
+      ),
+      id
     );
 
     // Add events to calendar
@@ -80,7 +106,7 @@ export async function GET(
     return new NextResponse(calendar.toString(), {
       headers: {
         "Content-Type": "text/calendar; charset=utf-8",
-        "Content-Disposition": `attachment; filename="${name}-sessions.ics"`,
+        "Content-Disposition": `attachment; filename="${formattedName}-sessions.ics"`,
       },
     });
   } catch (error) {

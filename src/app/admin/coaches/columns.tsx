@@ -1,7 +1,8 @@
 "use client";
 
+import { getCalendarUrl } from "@/server-actions/get-calendar-url";
 import { ColumnDef } from "@tanstack/react-table";
-import Link from "next/link";
+import { toast } from "sonner";
 
 export const columns: ColumnDef<{
   name: string;
@@ -13,16 +14,16 @@ export const columns: ColumnDef<{
   {
     id: "Calendar URL",
     cell: ({ row }) => {
-      const url = `https://intranet.emmabc.org/api/cal/coach/${encodeURIComponent(
-        row.original.name
-      )}`;
       return (
-        <Link
-          className="underline underline-offset-4 decoration-border"
-          href={url}
+        <p
+          onClick={async () => {
+            const url = await getCalendarUrl(row.original.name, true);
+            toast.success(url);
+          }}
+          className="underline underline-offset-4 decoration-border cursor-pointer"
         >
-          {url}
-        </Link>
+          Copy Calendar URL
+        </p>
       );
     },
     meta: {
