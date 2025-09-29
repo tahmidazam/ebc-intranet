@@ -7,7 +7,8 @@ export function sessionsToICalEventData(
   sessions: Doc<"sessions">[],
   users: Doc<"users">[],
   collections: Doc<"collections">[],
-  currentUserId?: string
+  currentUserId?: string,
+  coach?: boolean
 ): ICalEventData[] {
   // Create lookup maps
   const usersMap = users.reduce((map, user) => {
@@ -50,7 +51,7 @@ export function sessionsToICalEventData(
       start,
       end,
       id: session._id,
-      summary: `${collectionTitle} ${session.type.charAt(0).toUpperCase() + session.type.slice(1)} session`,
+      summary: `${coach ? "Coaching: " : ""}${collectionTitle} ${session.type.charAt(0).toUpperCase() + session.type.slice(1)} session`,
       description: [
         `Boat: ${session.boat}`,
         `Course: ${session.course}`,
