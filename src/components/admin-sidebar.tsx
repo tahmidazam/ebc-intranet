@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 import { UserSidebarMenuItem } from "@/components/user-sidebar-menu-item";
 import {
+  Bike,
   ChevronLeft,
   FolderGit,
   FolderSyncIcon,
@@ -34,6 +35,11 @@ const items = [
     title: "Members",
     href: "/admin/members",
     icon: Users2,
+  },
+  {
+    title: "Coaches",
+    href: "/admin/coaches",
+    icon: Bike,
   },
 ];
 

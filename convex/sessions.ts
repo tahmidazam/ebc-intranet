@@ -1,6 +1,5 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { getAuthUserId } from "@convex-dev/auth/server";
 
 export const insert = mutation({
     args: {
@@ -65,4 +64,13 @@ export const getByUser = query({
 
     return results.flat();
   },
+});
+
+export const getByCoach = query({
+  args: { coach: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db.query("sessions")
+      .withIndex("coach", q => q.eq("coach", args.coach))
+      .collect();
+  }
 });

@@ -1,6 +1,6 @@
+import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
-import { authTables } from "@convex-dev/auth/server";
 
 export default defineSchema({
   ...authTables,
@@ -69,6 +69,6 @@ export default defineSchema({
     .index("four", ["four"])
     .index("three", ["three"])
     .index("two", ["two"])
-    .index("bow", ["bow"]),
-
+    .index("bow", ["bow"])
+    .index("coach", ["coach"]),
 });

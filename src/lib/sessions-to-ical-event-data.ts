@@ -1,0 +1,69 @@
+import { SEAT_KEYS, SEAT_LABELS } from "@/schemas/seat";
+import { ICalEventData } from "ical-generator";
+import { Doc } from "../../convex/_generated/dataModel";
+import { formatName } from "./format-name";
+
+export function sessionsToICalEventData(
+  sessions: Doc<"sessions">[],
+  users: Doc<"users">[],
+  collections: Doc<"collections">[],
+  currentUserId?: string
+): ICalEventData[] {
+  // Create lookup maps
+  const usersMap = users.reduce((map, user) => {
+    if (user) map[user._id] = formatName(user) ?? "";
+    return map;
+  }, {} as Record<string, string>);
+
+  const collectionsMap = collections.reduce((map, collection) => {
+    if (collection) map[collection._id] = collection.title;
+    return map;
+  }, {} as Record<string, string>);
+
+  // Convert sessions to events
+  return sessions.map((session) => {
+    const start = new Date(session.timestamp);
+    const end = new Date(session.timestamp + session.duration * 60 * 1000);
+    
+    // Helper function to get user's seat in a session
+    const getUserSeat = (userId: string): string | null => {
+      const seatIndex = SEAT_KEYS.findIndex(key => session[key] === userId);
+      return seatIndex !== -1 ? SEAT_LABELS[seatIndex] : null;
+    };
+
+    // Helper function to build crew list
+    const buildCrewList = (): string => {
+      return SEAT_LABELS
+        .map((seatName, index) => {
+          const userId = session[SEAT_KEYS[index]];
+          return userId ? `${seatName}: ${usersMap[userId] || "Unknown"}` : null;
+        })
+        .filter(Boolean)
+        .join("\n");
+    };
+
+    const userSeat = currentUserId ? getUserSeat(currentUserId) : null;
+    const crewList = buildCrewList();
+    const collectionTitle = collectionsMap[session.collectionId] || "Unknown";
+
+    return {
+      start,
+      end,
+      id: session._id,
+      summary: `${collectionTitle} ${session.type.charAt(0).toUpperCase() + session.type.slice(1)} session`,
+      description: [
+        `Boat: ${session.boat}`,
+        `Course: ${session.course}`,
+        `Distance: ${session.distance} km`,
+        ``,
+        `Coach: ${session.coach}`,
+        ...(currentUserId ? [`Your seat: ${userSeat || "N/A"}`, ``] : []),
+        `Crew:`,
+        crewList,
+        ``,
+        `Outline: ${session.outline}`
+      ].join("\n").trim(),
+      location: "Emmanuel Boathouse, Cutter Ferry Ln, Cambridge, CB4 1JR",
+    };
+  });
+}
