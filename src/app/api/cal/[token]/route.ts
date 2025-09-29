@@ -87,7 +87,7 @@ export async function GET(
     const formattedName = coach ? id : user ? formatName(user) : "Unknown";
     // Create calendar
     const calendar = ical({
-      name: `EBC ${coach ? "Coaching" : ""}(${formattedName})`,
+      name: `EBC ${coach ? "Coaching " : ""}(${formattedName})`,
     });
 
     // Convert sessions to events using the extracted function
