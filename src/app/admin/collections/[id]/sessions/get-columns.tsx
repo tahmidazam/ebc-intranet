@@ -125,7 +125,7 @@ export const getColumns = (
     accessorKey: "outline",
     header: "Outline",
     meta: {
-      className: "w-full",
+      className: "w-full whitespace-normal break-words",
     },
   },
 ];
