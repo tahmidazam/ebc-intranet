@@ -1,5 +1,6 @@
 import { getCalendarUrl } from "@/server-actions/get-calendar-url";
 import { useQuery as useTanStackQuery } from "@tanstack/react-query";
+import Link from "next/link";
 
 export function CalendarUrlP({
   id,
@@ -15,5 +16,9 @@ export function CalendarUrlP({
 
   if (!url) return null;
 
-  return <p className={className}>{url.replaceAll("webcal", "https")}</p>;
+  return (
+    <Link className={className} href={url}>
+      {url}
+    </Link>
+  );
 }
