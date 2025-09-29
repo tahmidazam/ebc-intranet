@@ -86,7 +86,9 @@ export async function GET(
 
     const formattedName = coach ? id : user ? formatName(user) : "Unknown";
     // Create calendar
-    const calendar = ical({ name: `EBC ${coach ? "Coaching" : ""}(${formattedName})` });
+    const calendar = ical({
+      name: `EBC ${coach ? "Coaching" : ""}(${formattedName})`,
+    });
 
     // Convert sessions to events using the extracted function
     const events = sessionsToICalEventData(
@@ -95,7 +97,8 @@ export async function GET(
       collectionsArray.filter(
         (collection): collection is Doc<"collections"> => collection !== null
       ),
-      id
+      id,
+      coach
     );
 
     // Add events to calendar
