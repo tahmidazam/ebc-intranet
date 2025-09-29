@@ -10,7 +10,7 @@ import { useQuery } from "convex/react";
 import { useShallow } from "zustand/shallow";
 import { api } from "../../convex/_generated/api";
 import { Doc } from "../../convex/_generated/dataModel";
-
+import { CalendarUrlP } from "./calendar-url-p";
 export function Preferences({
   collections,
 }: {
@@ -120,6 +120,19 @@ export function Preferences({
             <p>Only Show Pinned Links</p>
           </Label>
         </div>
+      </div>
+
+      <h2 className="border-b py-2 px-4 align-middle whitespace-nowrap font-semibold text-sm">
+        Calendar
+      </h2>
+
+      <div className="p-4 flex flex-col gap-4">
+        <CalendarUrlP id={user?._id ?? ""} className="break-all" />
+
+        <p className="text-sm text-muted-foreground">
+          Copy and paste this URL into your calendar client to subscribe to your
+          personal EBC calendar.
+        </p>
       </div>
     </>
   );
