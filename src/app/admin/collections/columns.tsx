@@ -3,6 +3,7 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
+import { toast } from "sonner";
 import { Doc } from "../../../../convex/_generated/dataModel";
 
 export const columns: ColumnDef<Doc<"collections">>[] = [
@@ -68,6 +69,23 @@ export const columns: ColumnDef<Doc<"collections">>[] = [
         >
           Edit Access
         </Link>
+      );
+    },
+  },
+  {
+    id: "calendar",
+    cell: ({ row }) => {
+      return (
+        <p
+          className="underline underline-offset-4 decoration-border"
+          onClick={() => {
+            toast.success(
+              `webcal://intranet.emmabc.org/api/cal/collection/${row.original._id}`
+            );
+          }}
+        >
+          Get Calendar Link
+        </p>
       );
     },
     meta: {
