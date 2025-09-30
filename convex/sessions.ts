@@ -2,56 +2,68 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
 export const insert = mutation({
-    args: {
-        timestamp: v.number(),
-        duration: v.number(),
-        type: v.union(v.literal("water"), v.literal("land")),
-        athletes: v.record(v.string(), v.id("users")),
-        outline: v.optional(v.string()),
-        collectionId: v.id("collections"),
-        boat: v.optional(v.string()),
-        configuration: v.union(v.literal("8+"), v.literal("4+")),
-        course: v.optional(v.string()),
-        distance: v.optional(v.number()),
-        coach: v.optional(v.string()),
-    },
-    handler: async (ctx, args) => {
-        await ctx.db.insert("sessions", {
-            timestamp: args.timestamp,
-            duration: args.duration,
-            type: args.type,
-            outline: args.outline,
-            collectionId: args.collectionId,
-            boat: args.boat,
-            configuration: args.configuration,
-            course: args.course,
-            distance: args.distance,
-            coach: args.coach,
-            cox: args.athletes["cox"],
-            stroke: args.athletes["stroke"],
-            seven: args.athletes["7"],
-            six: args.athletes["6"],
-            five: args.athletes["5"],
-            four: args.athletes["4"],
-            three: args.athletes["3"],
-            two: args.athletes["2"],
-            bow: args.athletes["bow"],
-        });
-    },
+  args: {
+    timestamp: v.number(),
+    duration: v.number(),
+    type: v.union(v.literal("water"), v.literal("land")),
+    athletes: v.record(v.string(), v.id("users")),
+    outline: v.optional(v.string()),
+    collectionId: v.id("collections"),
+    boat: v.optional(v.string()),
+    configuration: v.union(v.literal("8+"), v.literal("4+")),
+    course: v.optional(v.string()),
+    distance: v.optional(v.number()),
+    coach: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.insert("sessions", {
+      timestamp: args.timestamp,
+      duration: args.duration,
+      type: args.type,
+      outline: args.outline,
+      collectionId: args.collectionId,
+      boat: args.boat,
+      configuration: args.configuration,
+      course: args.course,
+      distance: args.distance,
+      coach: args.coach,
+      cox: args.athletes["cox"],
+      stroke: args.athletes["stroke"],
+      seven: args.athletes["7"],
+      six: args.athletes["6"],
+      five: args.athletes["5"],
+      four: args.athletes["4"],
+      three: args.athletes["3"],
+      two: args.athletes["2"],
+      bow: args.athletes["bow"],
+    });
+  },
 });
 
 export const getByCollection = query({
-    args: { collectionId: v.id("collections") },
-    handler: async (ctx, args) => {
-        return await ctx.db.query("sessions")
-            .withIndex("collectionId", q => q.eq("collectionId", args.collectionId)).collect();
-    }
-})
+  args: { collectionId: v.id("collections") },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("sessions")
+      .withIndex("collectionId", (q) => q.eq("collectionId", args.collectionId))
+      .collect();
+  },
+});
 
 export const getByUser = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
-    const seats = ["cox", "stroke", "seven", "six", "five", "four", "three", "two", "bow"] as const;
+    const seats = [
+      "cox",
+      "stroke",
+      "seven",
+      "six",
+      "five",
+      "four",
+      "three",
+      "two",
+      "bow",
+    ] as const;
 
     const results = await Promise.all(
       seats.map((seat) =>
@@ -69,8 +81,45 @@ export const getByUser = query({
 export const getByCoach = query({
   args: { coach: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.db.query("sessions")
-      .withIndex("coach", q => q.eq("coach", args.coach))
+    return await ctx.db
+      .query("sessions")
+      .withIndex("coach", (q) => q.eq("coach", args.coach))
       .collect();
-  }
+  },
+});
+
+export const getById = query({
+  args: { id: v.id("sessions") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
+export const update = mutation({
+  args: {
+    id: v.id("sessions"),
+    type: v.union(v.literal("water"), v.literal("land")),
+    outline: v.optional(v.string()),
+    boat: v.optional(v.string()),
+    course: v.optional(v.string()),
+    distance: v.optional(v.number()),
+    coach: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, {
+      type: args.type,
+      outline: args.outline,
+      boat: args.boat,
+      course: args.course,
+      distance: args.distance,
+      coach: args.coach,
+    });
+  },
+});
+
+export const deleteSessions = mutation({
+  args: { ids: v.array(v.id("sessions")) },
+  handler: async (ctx, args) => {
+    await Promise.all(args.ids.map((sessionId) => ctx.db.delete(sessionId)));
+  },
 });

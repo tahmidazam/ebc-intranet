@@ -1,5 +1,6 @@
 "use client";
 
+import { DeleteSessionsAlertDialog } from "@/components/alert-dialogs/delete-session";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -28,7 +29,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useQuery } from "convex/react";
-import { FolderSyncIcon, Loader2Icon, PlusIcon } from "lucide-react";
+import { FolderSyncIcon, Loader2Icon, PlusIcon, TrashIcon } from "lucide-react";
 import Link from "next/link";
 import { use, useMemo, useState } from "react";
 import { api } from "../../../../../../convex/_generated/api";
@@ -47,7 +48,10 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
   const [rowSelection, setRowSelection] = useState({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const columns = useMemo(() => getColumns(users ?? []), [users]);
+  const columns = useMemo(
+    () => getColumns(users ?? [], id as Id<"collections">),
+    [users, id]
+  );
 
   const table = useReactTable({
     data: sessions ?? [],
@@ -105,6 +109,23 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         </div>
 
         <div className="flex flex-row items-center gap-2">
+          {table.getFilteredSelectedRowModel().rows.length > 0 && (
+            <DeleteSessionsAlertDialog
+              sessionIds={table
+                .getFilteredSelectedRowModel()
+                .rows.map((row) => row.original._id)}
+              onActionComplete={table.resetRowSelection}
+            >
+              <Button
+                variant="destructive"
+                className="rounded-full"
+                size="icon"
+              >
+                <TrashIcon />
+              </Button>
+            </DeleteSessionsAlertDialog>
+          )}
+
           <Button
             variant="outline"
             size="icon"

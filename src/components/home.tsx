@@ -58,6 +58,8 @@ export function Home() {
           <h1 className="font-medium text-2xl tracking-tight">EBC Intranet</h1>
 
           <div className="flex gap-2">
+            <CalendarSyncButton id={user?._id} />
+
             <CommandMenu
               collections={collections}
               isAdmin={user?.role === "admin"}

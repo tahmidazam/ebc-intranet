@@ -1,6 +1,9 @@
 "use client";
 
+import { CoachSelect } from "@/components/coach-select";
+import { CourseAndDistanceSelect } from "@/components/course-and-distance-select";
 import { DateTimeSelect } from "@/components/date-time-select";
+import { SessionTypeSelect } from "@/components/session-type-select";
 import { Badge } from "@/components/ui/badge";
 import {
   Breadcrumb,
@@ -39,8 +42,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { formatName } from "@/lib/format-name";
 import { resolveAvailabilities } from "@/lib/resolve-availabilities";
 import { cn } from "@/lib/utils";
-import { getCoaches } from "@/server-actions/get-coaches";
-import { useQuery as useTanStackQuery } from "@tanstack/react-query";
+import { BOATS } from "@/schemas/boat";
+import { COURSE_CASES } from "@/schemas/course";
 import { useMutation, useQuery } from "convex/react";
 import { format } from "date-fns";
 import { FolderSync, Loader2Icon } from "lucide-react";
@@ -51,27 +54,6 @@ import { toast } from "sonner";
 import z from "zod";
 import { api } from "../../../../../../../convex/_generated/api";
 import { Doc, Id } from "../../../../../../../convex/_generated/dataModel";
-
-const COURSE_CASES = [
-  {
-    label: "1x",
-    distance: 8,
-  },
-  {
-    label: "1.5x",
-    distance: 11,
-  },
-  {
-    label: "2x",
-    distance: 14,
-  },
-];
-
-const BOATS = [
-  { name: "Phil Turner (VII)", configuration: "8+" },
-  { name: "Paul Collins (IV)", configuration: "4+" },
-  { name: "Rev Reed (IV)", configuration: "4+" },
-];
 
 const SEAT_CASES = ["cox", "stroke", "7", "6", "5", "4", "3", "2", "bow"];
 export default function ResolveAvailabilitiesPage({
@@ -89,11 +71,6 @@ export default function ResolveAvailabilitiesPage({
   });
   const collection = useQuery(api.collections.getById, {
     id: id as Id<"collections">,
-  });
-
-  const { data: coaches } = useTanStackQuery({
-    queryKey: ["coaches"],
-    queryFn: getCoaches,
   });
 
   const insertSession = useMutation(api.sessions.insert);
@@ -120,7 +97,7 @@ export default function ResolveAvailabilitiesPage({
     return users;
   }, [allUsers, dateTime, duration, sessions]);
 
-  if (!collections || !allUsers || !coaches || !sessions || !collection)
+  if (!collections || !allUsers || !sessions || !collection)
     return (
       <main className="flex items-center justify-center h-screen w-full">
         <Loader2Icon className="animate-spin" />
@@ -355,23 +332,7 @@ export default function ResolveAvailabilitiesPage({
             <Panel>
               <div className="flex flex-col p-2 gap-4 h-full">
                 <div className="flex flex-row gap-4">
-                  <div className="flex flex-col gap-2 w-full">
-                    <Label>Session Type</Label>
-                    <Select
-                      value={type}
-                      onValueChange={(value) =>
-                        setType(value as "water" | "land")
-                      }
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select session type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="water">Water</SelectItem>
-                        <SelectItem value="land">Land</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <SessionTypeSelect value={type} onValueChange={setType} />
 
                   <div className="flex flex-col gap-2 w-full">
                     <Label htmlFor="boat">Boat</Label>
@@ -411,35 +372,11 @@ export default function ResolveAvailabilitiesPage({
                     </Select>
                   </div>
 
-                  <div className="flex flex-col gap-2 w-full">
-                    <Label htmlFor="distance">Course & Distance</Label>
-                    <Select
-                      value={course}
-                      onValueChange={(value) => {
-                        setCourse(value);
-                        const courseCase = COURSE_CASES.find(
-                          (courseCase) => courseCase.label === value
-                        );
-                        if (courseCase) {
-                          setDistance(courseCase.distance);
-                        }
-                      }}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Course" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {COURSE_CASES.map((courseCase) => (
-                          <SelectItem
-                            key={courseCase.label}
-                            value={courseCase.label}
-                          >
-                            {courseCase.label} ({courseCase.distance}km)
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <CourseAndDistanceSelect
+                    course={course}
+                    setCourse={setCourse}
+                    setDistance={setDistance}
+                  />
                 </div>
 
                 <div className="flex flex-col gap-2 w-full flex-1">
@@ -459,8 +396,8 @@ export default function ResolveAvailabilitiesPage({
 
             <Panel>
               <div className="flex flex-col gap-4 pt-2 h-full">
-                <div className="flex flex-row gap-4">
-                  <div className="flex flex-col gap-2 w-full px-2">
+                <div className="flex flex-row gap-4 px-2">
+                  <div className="flex flex-col gap-2 w-full">
                     <Label>Configuration</Label>
                     <Select
                       value={configuration}
@@ -478,24 +415,7 @@ export default function ResolveAvailabilitiesPage({
                     </Select>
                   </div>
 
-                  <div className="flex flex-col gap-2 w-full px-2">
-                    <Label>Coach</Label>
-                    <Select
-                      value={coach}
-                      onValueChange={(value) => setCoach(value)}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select coach" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {coaches.map((coach: string) => (
-                          <SelectItem key={coach} value={coach}>
-                            {coach}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <CoachSelect coach={coach} setCoach={setCoach} />
                 </div>
 
                 <Table>

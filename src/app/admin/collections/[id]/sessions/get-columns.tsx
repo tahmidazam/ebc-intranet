@@ -1,15 +1,16 @@
 "use client";
 
-import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
-import Link from "next/link";
-import { Doc } from "../../../../../../convex/_generated/dataModel";
-import { format } from "date-fns";
 import { capitalise } from "@/lib/capitalise";
 import { formatName } from "@/lib/format-name";
+import { ColumnDef } from "@tanstack/react-table";
+import { format } from "date-fns";
+import Link from "next/link";
+import { Doc, Id } from "../../../../../../convex/_generated/dataModel";
 
 export const getColumns = (
-  users: Doc<"users">[]
+  users: Doc<"users">[],
+  collectionId: Id<"collections">
 ): ColumnDef<Doc<"sessions">>[] => [
   {
     id: "select",
@@ -126,6 +127,22 @@ export const getColumns = (
     header: "Outline",
     meta: {
       className: "w-full whitespace-normal break-words",
+    },
+  },
+  {
+    id: "edit",
+    cell: ({ row }) => {
+      return (
+        <Link
+          className="underline underline-offset-4 decoration-border"
+          href={`/admin/collections/${collectionId}/sessions/${row.original._id}/edit`}
+        >
+          Edit
+        </Link>
+      );
+    },
+    meta: {
+      className: "w-full",
     },
   },
 ];
