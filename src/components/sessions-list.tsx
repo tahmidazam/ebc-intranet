@@ -19,8 +19,7 @@ export function SessionsList({ events }: { events: Event[] }) {
       {events.map((event) => {
         return (
           <div key={event.id} className="border-b px-4 py-2">
-            <h2 className="">{event.summary}</h2>
-            <p className="text-sm text-muted-foreground">
+            <p className="font-medium">
               {`${formatInTimeZone(
                 event.start,
                 "Europe/London",
@@ -33,6 +32,9 @@ export function SessionsList({ events }: { events: Event[] }) {
                 event.duration
               }min)`}
             </p>
+
+            <h2 className="text-sm text-muted-foreground">{event.summary}</h2>
+
             <div className="grid grid-cols-2 gap-4 text-sm py-2">
               <div className="flex flex-col gap-1">
                 <div>
@@ -53,7 +55,7 @@ export function SessionsList({ events }: { events: Event[] }) {
 
               <div className="grid grid-cols-[auto_1fr] gap-x-2">
                 {event.seats &&
-                  SEAT_LABELS.map((seatLabel, index) => {
+                  SEAT_LABELS.map((seatLabel) => {
                     const name = event.seats[seatLabel];
                     if (!name) return null;
                     return (
@@ -78,7 +80,9 @@ export function SessionsList({ events }: { events: Event[] }) {
                   })}
               </div>
             </div>
-            <p>{event.outline}</p>
+            <p className="text-sm">
+              <span className="font-medium">Outline</span> {event.outline}
+            </p>
           </div>
         );
       })}
