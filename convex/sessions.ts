@@ -1,4 +1,6 @@
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
+import { Doc, Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 
 export const insert = mutation({
@@ -47,6 +49,79 @@ export const getByCollection = query({
       .query("sessions")
       .withIndex("collectionId", (q) => q.eq("collectionId", args.collectionId))
       .collect();
+  },
+});
+
+export const getByCurrentUser = query({
+  args: {},
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      return null;
+    }
+
+    const seats = [
+      "cox",
+      "stroke",
+      "seven",
+      "six",
+      "five",
+      "four",
+      "three",
+      "two",
+      "bow",
+    ] as const;
+    type Seat = (typeof seats)[number];
+
+    const results = await (
+      await Promise.all(
+        seats.map((seat) =>
+          ctx.db
+            .query("sessions")
+            .withIndex(seat, (q) => q.eq(seat, userId))
+            .collect()
+        )
+      )
+    ).flat();
+
+    const { userIds, collectionIds } = results.reduce(
+      (acc, session) => {
+        // Add all crew members to userIds set
+        seats.forEach((key) => {
+          if (session[key]) acc.userIds.add(session[key]);
+        });
+
+        // Add collection ID
+        acc.collectionIds.add(session.collectionId);
+
+        return acc;
+      },
+      {
+        userIds: new Set<string>(),
+        collectionIds: new Set<string>(),
+      }
+    );
+
+    // Batch fetch all required data
+    const [usersArray, collectionsArray] = await Promise.all([
+      Promise.all(
+        Array.from(userIds).map((uid) => ctx.db.get(uid as Id<"users">))
+      ),
+      Promise.all(
+        Array.from(collectionIds).map((cid) =>
+          ctx.db.get(cid as Id<"collections">)
+        )
+      ),
+    ]);
+
+    return {
+      sessions: results,
+      users: usersArray.filter((u): u is Doc<"users"> => u !== null),
+      collections: collectionsArray.filter(
+        (c): c is Doc<"collections"> => c !== null
+      ),
+    };
   },
 });
 

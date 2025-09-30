@@ -12,6 +12,10 @@ interface IntranetState {
   setKeepCollectionsCollapsed: (value: boolean) => void;
   onlyShowPinnedLinks: boolean;
   setOnlyShowPinnedLinks: (value: boolean) => void;
+  tab: "links" | "sessions" | "settings";
+  setTab: (tab: "links" | "sessions" | "settings") => void;
+  sessionsToDisplay: "upcoming" | "past";
+  setSessionsToDisplay: (value: "upcoming" | "past") => void;
 }
 
 export const useIntranetStore = create<IntranetState>()(
@@ -36,6 +40,10 @@ export const useIntranetStore = create<IntranetState>()(
       onlyShowPinnedLinks: false,
       setOnlyShowPinnedLinks: (value: boolean) =>
         set({ onlyShowPinnedLinks: value }),
+      tab: "links",
+      setTab: (tab) => set({ tab }),
+      sessionsToDisplay: "upcoming",
+      setSessionsToDisplay: (value) => set({ sessionsToDisplay: value }),
     }),
     {
       name: "intranet-store",

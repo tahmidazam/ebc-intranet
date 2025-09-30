@@ -1,12 +1,12 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { DrawerClose } from "@/components/ui/drawer";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { formatName } from "@/lib/format-name";
 import { useIntranetStore } from "@/lib/store";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useQuery } from "convex/react";
+import { CircleAlert } from "lucide-react";
 import { useShallow } from "zustand/shallow";
 import { api } from "../../convex/_generated/api";
 import { Doc } from "../../convex/_generated/dataModel";
@@ -67,11 +67,50 @@ export function Preferences({
           </div>
         </div>
 
-        <DrawerClose asChild>
-          <Button className="rounded-full" variant="outline" onClick={signOut}>
-            Sign out
-          </Button>
-        </DrawerClose>
+        <Button className="rounded-full" variant="outline" onClick={signOut}>
+          Sign out
+        </Button>
+      </div>
+
+      <h2 className="border-b py-2 px-4 align-middle whitespace-nowrap font-semibold text-sm">
+        Calendar
+      </h2>
+
+      <div className="p-4 flex flex-col gap-4">
+        {user?._id && (
+          <CalendarUrlP id={user._id} className="break-all text-xs font-mono" />
+        )}
+
+        {user?._id && <CalendarUrlP id={user._id} button />}
+
+        <p className="text-sm text-muted-foreground">
+          Follow this link directly if you want to add it to your operating
+          system&apos;s calendar app.
+        </p>
+
+        {user?._id && (
+          <CalendarUrlP
+            id={user._id}
+            useHttps
+            className="break-all text-xs font-mono"
+          />
+        )}
+
+        {user?._id && <CalendarUrlP id={user._id} clipboardButton />}
+
+        <p className="text-sm text-muted-foreground">
+          Copy paste this link into the calendar subscription URL field in your
+          third-party calendar client (e.g., Outlook).{" "}
+        </p>
+
+        <div className="flex items-center gap-2 text-orange-500 text-sm p-2 bg-orange-50 dark:bg-orange-500/10 rounded-2xl border border-orange-200 dark:border-orange-900 box-border">
+          <CircleAlert className="shrink-0 size-5 mx-2" />
+
+          <p className="grow">
+            Do not follow this link directly; otherwise your calendar will not
+            update automatically.
+          </p>
+        </div>
       </div>
 
       <h2 className="border-b py-2 px-4 align-middle whitespace-nowrap font-semibold text-sm">
@@ -120,34 +159,6 @@ export function Preferences({
             <p>Only Show Pinned Links</p>
           </Label>
         </div>
-      </div>
-
-      <h2 className="border-b py-2 px-4 align-middle whitespace-nowrap font-semibold text-sm">
-        Calendar
-      </h2>
-
-      <div className="p-4 flex flex-col gap-4">
-        <CalendarUrlP
-          id={user?._id ?? ""}
-          className="break-all text-sm font-mono"
-        />
-
-        <p className="text-sm text-muted-foreground">
-          Follow this link directly if you want to add it to your operating
-          system&apos;s calendar app.
-        </p>
-
-        <CalendarUrlP
-          useHttps
-          id={user?._id ?? ""}
-          className="break-all text-sm font-mono"
-        />
-
-        <p className="text-sm text-muted-foreground">
-          Copy paste this link into the calendar subscription URL field in your
-          third-party calendar client (e.g., Outlook). Do not follow this link
-          directly; otherwise your calendar will not update automatically.
-        </p>
       </div>
     </>
   );

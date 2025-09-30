@@ -4,14 +4,6 @@ import { CollectionsList } from "@/components/collections-list";
 import { CommandMenu } from "@/components/command-menu";
 import { Preferences } from "@/components/preferences";
 import { Button } from "@/components/ui/button";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
 import {
   Sheet,
@@ -23,14 +15,20 @@ import {
 } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { capitalise } from "@/lib/capitalise";
+import { sessionsToResolvedEvents } from "@/lib/sessions-to-events";
+import { useIntranetStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
-import { Loader2Icon, LockIcon, SettingsIcon, XIcon } from "lucide-react";
+import { Loader2Icon, LockIcon, SettingsIcon } from "lucide-react";
 import { useMotionValueEvent, useScroll } from "motion/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useShallow } from "zustand/shallow";
 import { api } from "../../convex/_generated/api";
 import { CalendarSyncButton } from "./calendar-sync-button";
+import { SessionsList } from "./sessions-list";
+import { TabBar } from "./tab-bar";
+import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 
 export function Home() {
   const collections = useQuery(api.collections.getUserCollectionsWithLinks);
@@ -38,12 +36,38 @@ export function Home() {
   const { scrollY } = useScroll();
   const [showBorder, setShowBorder] = useState(false);
   const user = useQuery(api.user.currentUser);
+  const tab = useIntranetStore(useShallow((state) => state.tab));
+  const sessionsToDisplay = useIntranetStore(
+    useShallow((state) => state.sessionsToDisplay)
+  );
+  const setSessionsToDisplay = useIntranetStore(
+    useShallow((state) => state.setSessionsToDisplay)
+  );
 
   useMotionValueEvent(scrollY, "change", (current) => {
     setShowBorder(current > 0);
   });
 
-  if (!collections || !user) {
+  const queryResult = useQuery(api.sessions.getByCurrentUser);
+
+  const filteredEvents = useMemo(() => {
+    if (!queryResult || !user) return null;
+    const events = sessionsToResolvedEvents(
+      queryResult.sessions,
+      queryResult.users,
+      queryResult.collections,
+      user._id
+    ).sort((a, b) => a.start.getTime() - b.start.getTime());
+
+    const now = new Date();
+    if (sessionsToDisplay === "upcoming") {
+      return events.filter((event) => event.end > now);
+    } else {
+      return events.filter((event) => event.end <= now);
+    }
+  }, [queryResult, user?._id, sessionsToDisplay]);
+
+  if (!collections || !user || !filteredEvents) {
     return (
       <main className="flex items-center justify-center h-screen w-full">
         <Loader2Icon className="animate-spin" />
@@ -113,15 +137,15 @@ export function Home() {
                 "calc(var(--spacing) * 4 + env(safe-area-inset-right))",
             }}
           >
-            <div className="flex items-center justify-between">
-              <CalendarSyncButton id={user?._id} />
-
+            <div className="flex items-center justify-center">
               <div
                 className={cn(
                   "flex flex-col items-center transition-opacity duration-200"
                 )}
               >
-                <h1 className="font-medium tracking-tight">EBC Intranet</h1>
+                <h1 className="font-medium tracking-tight">
+                  {capitalise(tab)}
+                </h1>
                 <p className="text-muted-foreground text-xs">
                   {[
                     user?.email.split("@")[0],
@@ -135,43 +159,27 @@ export function Home() {
                     .join(" · ")}
                 </p>
               </div>
-
-              <Drawer>
-                <DrawerTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-full"
-                  >
-                    <SettingsIcon />
-                  </Button>
-                </DrawerTrigger>
-                <DrawerContent
-                  style={{
-                    paddingBottom: "env(safe-area-inset-bottom)",
-                    height: "calc(100vh - env(safe-area-inset-top))",
-                  }}
-                >
-                  <DrawerHeader className="flex flex-row items-center justify-between">
-                    <DrawerTitle className="font-medium text-2xl tracking-tight">
-                      Preferences
-                    </DrawerTitle>
-
-                    <DrawerClose asChild>
-                      <Button
-                        className="rounded-full"
-                        variant="outline"
-                        size="icon"
-                      >
-                        <XIcon />
-                      </Button>
-                    </DrawerClose>
-                  </DrawerHeader>
-
-                  <Preferences collections={collections} />
-                </DrawerContent>
-              </Drawer>
             </div>
+
+            {tab === "sessions" && (
+              <Tabs
+                defaultValue="upcoming"
+                value={sessionsToDisplay}
+                onValueChange={(value) =>
+                  setSessionsToDisplay(value as "upcoming" | "past")
+                }
+                className="w-full"
+              >
+                <TabsList className="w-full flex">
+                  <TabsTrigger value="upcoming" className="flex-1 w-full">
+                    Upcoming
+                  </TabsTrigger>
+                  <TabsTrigger value="past" className="flex-1 w-full">
+                    Past
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            )}
           </div>
 
           <Separator
@@ -185,15 +193,24 @@ export function Home() {
 
       <div
         style={{
-          paddingTop: "calc(env(safe-area-inset-top) + 52px)",
-          paddingBottom: "env(safe-area-inset-bottom)",
+          paddingTop: `calc(env(safe-area-inset-top) + 52px ${
+            tab === "sessions" ? "+ 52px" : ""
+          })`,
+          paddingBottom:
+            "calc(env(safe-area-inset-bottom) + 56px + var(--spacing) * 8)",
           paddingLeft: "env(safe-area-inset-left))",
           paddingRight: "env(safe-area-inset-right))",
         }}
         className="min-h-screen"
       >
-        <CollectionsList collections={collections} />
+        {tab === "links" && <CollectionsList collections={collections} />}
+
+        {tab === "sessions" && <SessionsList events={filteredEvents} />}
+
+        {tab === "settings" && <Preferences collections={collections} />}
       </div>
+
+      <TabBar />
     </main>
   );
 }

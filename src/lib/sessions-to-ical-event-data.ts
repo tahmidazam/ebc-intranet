@@ -57,7 +57,7 @@ export function sessionsToICalEventData(
       ...(session.course ? [`Course: ${session.course}`] : []),
       ...(session.distance ? [`Distance: ${session.distance} km`] : []),
       ``,
-      `Coach: ${session.coach}`,
+      ...(session.coach ? [`Coach: ${session.coach}`] : []),
       ...(currentUserId ? [`Your seat: ${userSeat || "N/A"}`, ``] : []),
       `Crew:`,
       crewList,

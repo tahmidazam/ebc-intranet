@@ -7,7 +7,6 @@ import {
   PinIcon,
   PinOffIcon,
 } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useShallow } from "zustand/shallow";
@@ -114,29 +113,22 @@ function CollectionsListSection({
         </button>
       </div>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            {collection.links.map((link) => (
-              <div key={link._id} className="flex hover:bg-muted/50 border-b">
-                <Link
-                  className="py-2 px-4 align-middle whitespace-nowrap grow"
-                  href={transformMobileUrl(link.url, os)}
-                >
-                  {link.title}
-                </Link>
+      {open && (
+        <div>
+          {collection.links.map((link) => (
+            <div key={link._id} className="flex hover:bg-muted/50 border-b">
+              <Link
+                className="py-2 px-4 align-middle whitespace-nowrap grow"
+                href={transformMobileUrl(link.url, os)}
+              >
+                {link.title}
+              </Link>
 
-                <TogglePinButton link={link} />
-              </div>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
+              <TogglePinButton link={link} />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
