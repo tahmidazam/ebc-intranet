@@ -62,7 +62,7 @@ export default function EditSession({
     setDistance(session.distance);
     setCourse(session.course);
     setCoach(session.coach);
-    session.outline && setOutline(session.outline);
+    if (session.outline) setOutline(session.outline);
   }, [session]);
 
   const router = useRouter();

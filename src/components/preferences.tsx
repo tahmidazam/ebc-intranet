@@ -134,7 +134,7 @@ export function Preferences({
 
         <p className="text-sm text-muted-foreground">
           Follow this link directly if you want to add it to your operating
-          system's calendar app.
+          system&apos;s calendar app.
         </p>
 
         <CalendarUrlP

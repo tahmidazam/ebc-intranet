@@ -86,8 +86,12 @@ export default function ResolveAvailabilitiesPage({
   const [configuration, setConfiguration] = useState<"8+" | "4+">("8+");
   const [boat, setBoat] = useState<string | undefined>(BOATS[0].name);
   const [athletes, setAthletes] = useState<Record<string, Id<"users">>>({});
-  const [distance, setDistance] = useState<number>(COURSE_CASES[0].distance);
-  const [course, setCourse] = useState(COURSE_CASES[0].label);
+  const [distance, setDistance] = useState<number | undefined>(
+    COURSE_CASES[0].distance
+  );
+  const [course, setCourse] = useState<string | undefined>(
+    COURSE_CASES[0].label
+  );
   const [coach, setCoach] = useState<string | undefined>(undefined);
 
   const users = useMemo(() => {
