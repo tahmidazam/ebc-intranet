@@ -47,21 +47,16 @@ export function sessionsToICalEventData(
     const crewList = buildCrewList();
     const collectionTitle = collectionsMap[session.collectionId] || "Unknown";
 
-    // Build description lines for boat, course, distance
-    const boatCourseDistanceLines = [
-      ...(session.boat ? [`Boat: ${session.boat}`] : []),
-      ...(session.course ? [`Course: ${session.course}`] : []),
-      ...(session.distance ? [`Distance: ${session.distance} km`] : []),
-    ];
-
     return {
       start,
       end,
       id: session._id,
       summary: `${coach ? "Coaching: " : ""}${collectionTitle} ${session.type.charAt(0).toUpperCase() + session.type.slice(1)} session`,
       description: [
-      ...boatCourseDistanceLines,
-      ...(boatCourseDistanceLines.length ? [""] : []),
+      ...(session.boat ? [`Boat: ${session.boat}`] : []),
+      ...(session.course ? [`Course: ${session.course}`] : []),
+      ...(session.distance ? [`Distance: ${session.distance} km`] : []),
+      ``,
       `Coach: ${session.coach}`,
       ...(currentUserId ? [`Your seat: ${userSeat || "N/A"}`, ``] : []),
       `Crew:`,
