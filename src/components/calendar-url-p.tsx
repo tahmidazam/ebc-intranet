@@ -5,9 +5,11 @@ import Link from "next/link";
 export function CalendarUrlP({
   id,
   className,
+  useHttps,
 }: {
   id: string;
   className?: string;
+  useHttps?: boolean;
 }) {
   const { data: url } = useTanStackQuery({
     queryKey: ["calendar-token"],
@@ -18,7 +20,7 @@ export function CalendarUrlP({
 
   return (
     <Link className={className} href={url}>
-      {url}
+      {useHttps ? url.replace("webcal", "https") : url}
     </Link>
   );
 }

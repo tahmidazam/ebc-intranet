@@ -127,11 +127,26 @@ export function Preferences({
       </h2>
 
       <div className="p-4 flex flex-col gap-4">
-        <CalendarUrlP id={user?._id ?? ""} className="break-all" />
+        <CalendarUrlP
+          id={user?._id ?? ""}
+          className="break-all text-sm font-mono"
+        />
 
         <p className="text-sm text-muted-foreground">
-          Copy and paste this URL into your calendar client to subscribe to your
-          personal EBC calendar.
+          Follow this link directly if you want to add it to your operating
+          system's calendar app.
+        </p>
+
+        <CalendarUrlP
+          useHttps
+          id={user?._id ?? ""}
+          className="break-all text-sm font-mono"
+        />
+
+        <p className="text-sm text-muted-foreground">
+          Copy paste this link into the calendar subscription URL field in your
+          third-party calendar client (e.g., Outlook). Do not follow this link
+          directly; otherwise your calendar will not update automatically.
         </p>
       </div>
     </>
