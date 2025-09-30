@@ -30,7 +30,7 @@ export async function GET(
     }
 
     // Collect unique IDs in a single pass
-    const { userIds, collectionIds } = sessions.reduce(
+    const { userIds } = sessions.reduce(
       (acc, session) => {
         // Add all crew members to userIds set
         SEAT_KEYS.forEach((key) => {

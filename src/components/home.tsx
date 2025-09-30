@@ -65,7 +65,7 @@ export function Home() {
     } else {
       return events.filter((event) => event.end <= now);
     }
-  }, [queryResult, user?._id, sessionsToDisplay]);
+  }, [queryResult, user, sessionsToDisplay]);
 
   if (!collections || !user || !filteredEvents) {
     return (
