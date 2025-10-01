@@ -45,7 +45,12 @@ export function CollectionsList({
     <div className="flex flex-col">
       {pinnedLinkIds.length > 0 && (
         <>
-          <h2 className="border-b py-2 px-4 align-middle whitespace-nowrap font-semibold text-sm">
+          <h2
+            className="border-b py-2 px-4 align-middle whitespace-nowrap font-semibold text-sm sticky bg-background z-10"
+            style={{
+              top: "calc(env(safe-area-inset-top) + 56px)",
+            }}
+          >
             Pinned
           </h2>
 
