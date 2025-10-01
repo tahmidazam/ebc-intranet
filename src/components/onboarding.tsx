@@ -41,7 +41,13 @@ export function Onboarding() {
     >
       <div className="flex flex-col justify-center items-center grow gap-4">
         <div className="flex flex-col gap-8 items-center">
-          <Image src="/emma-logo.png" width={85} height={85} alt="Emma Logo" />
+          <Image
+            src="/emma-logo.png"
+            width={85}
+            height={85}
+            alt="Emma Logo"
+            priority
+          />
 
           <div className="flex flex-col items-center gap-2">
             <h1 className="tracking-tight text-2xl font-semibold text-center text-balance">
