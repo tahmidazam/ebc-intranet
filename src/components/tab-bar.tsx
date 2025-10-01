@@ -9,7 +9,7 @@ export function TabBar() {
 
   return (
     <div
-      className="fixed bottom-0 left-0 grid grid-cols-3 w-full bg-background/10 backdrop-blur-3xl border-t pt-2"
+      className="fixed bottom-0 left-0 grid grid-cols-3 w-full bg-background/10 backdrop-blur-3xl border-t pt-2 z-20"
       style={{
         paddingBottom: "calc(var(--spacing) * 2 + env(safe-area-inset-bottom))",
       }}
