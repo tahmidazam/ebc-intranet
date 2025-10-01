@@ -1,6 +1,7 @@
 import { SEAT_KEYS, SEAT_LABELS } from "@/schemas/seat";
 import { ICalEventData } from "ical-generator";
 import { Doc } from "../../convex/_generated/dataModel";
+import { encodeName } from "./coach-name-encryption";
 import { formatName } from "./format-name";
 
 export function sessionsToICalEventData(
@@ -62,7 +63,9 @@ export function sessionsToICalEventData(
       `Crew:`,
       crewList,
       ``,
-      `Outline: ${session.outline}`
+      `Outline: ${session.outline}`,
+      ``,
+      ...((session.coach || currentUserId) ? [`Comment on this session: https://intranet.emmabc.org/comment/${session._id}${coach && session.coach ? `?coach=${encodeName(session.coach)}` : currentUserId ? `?userId=${currentUserId}` : ""}`] : []),
       ].join("\n").trim(),
       location: "Emmanuel Boathouse, Cutter Ferry Ln, Cambridge, CB4 1JR",
     };

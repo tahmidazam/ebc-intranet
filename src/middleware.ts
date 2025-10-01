@@ -4,7 +4,7 @@ import {
   nextjsMiddlewareRedirect,
 } from "@convex-dev/auth/nextjs/server";
 
-const isPublicRoute = createRouteMatcher(["/", "/sign-in(.*)"]);
+const isPublicRoute = createRouteMatcher(["/", "/sign-in(.*)", "/comment(.*)"]);
 const isSignInRouter = createRouteMatcher(["/sign-in(.*)"]);
 const isApiRoute = createRouteMatcher(["/api(.*)"]);
 

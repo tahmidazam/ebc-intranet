@@ -20,6 +20,7 @@ import type * as collectionMembers from "../collectionMembers.js";
 import type * as collections from "../collections.js";
 import type * as http from "../http.js";
 import type * as links from "../links.js";
+import type * as sessionComments from "../sessionComments.js";
 import type * as sessions from "../sessions.js";
 import type * as user from "../user.js";
 
@@ -39,6 +40,7 @@ declare const fullApi: ApiFromModules<{
   collections: typeof collections;
   http: typeof http;
   links: typeof links;
+  sessionComments: typeof sessionComments;
   sessions: typeof sessions;
   user: typeof user;
 }>;

@@ -79,4 +79,10 @@ export default defineSchema({
     .index("token", ["token"])
     .index("id", ["id"])
     .index("id_coach", ["id", "coach"]),
+  sessionComments: defineTable({
+    sessionId: v.id("sessions"),
+    content: v.string(),
+    timestamp: v.number(),
+    author: v.string(),
+  }).index("sessionId", ["sessionId"]),
 });

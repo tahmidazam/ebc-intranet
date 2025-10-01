@@ -1,8 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { z } from "zod";
 import { Id } from "./_generated/dataModel";
+import { mutation, query } from "./_generated/server";
 
 export const collect = query({
   args: {},
@@ -86,6 +85,14 @@ export const getById = query({
   args: { id: v.id("users") },
   handler: async (ctx, { id }) => {
     return await ctx.db.get(id);
+  },
+});
+
+export const tryGetById = query({
+  args: { id: v.optional(v.string()) },
+  handler: async (ctx, { id }) => {
+    if (!id) return null;
+    return await ctx.db.get(id as Id<"users">);
   },
 });
 

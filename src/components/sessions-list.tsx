@@ -5,6 +5,8 @@ import { Event } from "@/schemas/event";
 import { SEAT_LABELS } from "@/schemas/seat";
 import { formatInTimeZone } from "date-fns-tz";
 import React from "react";
+import { Id } from "../../convex/_generated/dataModel";
+import { CommentsDrawer } from "./comments-drawer";
 import { Badge } from "./ui/badge";
 
 export function SessionsList({
@@ -44,24 +46,29 @@ export function SessionsList({
 
             <div>
               {section.events.map((event: Event) => (
-                <div key={event.id} className="border-b px-4 py-2">
-                  <p className="font-medium">
-                    {`${formatInTimeZone(
-                      event.start,
-                      "Europe/London",
-                      "HH:mm"
-                    )}–${formatInTimeZone(
-                      event.end,
-                      "Europe/London",
-                      "HH:mm"
-                    )} (${event.duration}min)`}
-                  </p>
+                <div
+                  key={event.id}
+                  className="border-b flex flex-col px-4 py-2 gap-2"
+                >
+                  <div>
+                    <p className="font-medium">
+                      {`${formatInTimeZone(
+                        event.start,
+                        "Europe/London",
+                        "HH:mm"
+                      )}–${formatInTimeZone(
+                        event.end,
+                        "Europe/London",
+                        "HH:mm"
+                      )} (${event.duration}min)`}
+                    </p>
 
-                  <h2 className="text-sm text-muted-foreground">
-                    {event.summary}
-                  </h2>
+                    <p className="text-sm text-muted-foreground">
+                      {event.summary}
+                    </p>
+                  </div>
 
-                  <div className="grid grid-cols-2 gap-4 text-sm py-2">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
                     <div className="flex flex-col gap-1">
                       {event.boat && (
                         <div>
@@ -122,6 +129,8 @@ export function SessionsList({
                       <p>{event.outline}</p>
                     </div>
                   )}
+
+                  <CommentsDrawer sessionId={event.id as Id<"sessions">} />
                 </div>
               ))}
             </div>
