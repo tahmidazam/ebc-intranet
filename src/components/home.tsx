@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { capitalise } from "@/lib/capitalise";
+import { groupEventsByDay } from "@/lib/group-events-by-day";
 import { sessionsToResolvedEvents } from "@/lib/sessions-to-events";
 import { useIntranetStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -50,7 +51,7 @@ export function Home() {
 
   const queryResult = useQuery(api.sessions.getByCurrentUser);
 
-  const filteredEvents = useMemo(() => {
+  const groupedEvents = useMemo(() => {
     if (!queryResult || !user) return null;
     const events = sessionsToResolvedEvents(
       queryResult.sessions,
@@ -61,13 +62,13 @@ export function Home() {
 
     const now = new Date();
     if (sessionsToDisplay === "upcoming") {
-      return events.filter((event) => event.end > now);
+      return groupEventsByDay(events.filter((event) => event.end > now));
     } else {
-      return events.filter((event) => event.end <= now);
+      return groupEventsByDay(events.filter((event) => event.end <= now));
     }
   }, [queryResult, user, sessionsToDisplay]);
 
-  if (!collections || !user || !filteredEvents) {
+  if (!collections || !user || !groupedEvents) {
     return (
       <main className="flex items-center justify-center h-screen w-full">
         <Loader2Icon className="animate-spin" />
@@ -125,7 +126,7 @@ export function Home() {
 
   return (
     <main className="h-screen">
-      <div className="fixed top-0 w-full">
+      <div className="fixed top-0 w-full z-20">
         <nav>
           <div
             className="flex flex-col pb-2 gap-2 bg-background/10 backdrop-blur-3xl w-full"
@@ -193,8 +194,8 @@ export function Home() {
 
       <div
         style={{
-          paddingTop: `calc(env(safe-area-inset-top) + 52px ${
-            tab === "sessions" ? "+ 52px" : ""
+          paddingTop: `calc(env(safe-area-inset-top) + 56px ${
+            tab === "sessions" ? "+ 44px" : ""
           })`,
           paddingBottom:
             "calc(env(safe-area-inset-bottom) + 56px + var(--spacing) * 8)",
@@ -205,7 +206,12 @@ export function Home() {
       >
         {tab === "links" && <CollectionsList collections={collections} />}
 
-        {tab === "sessions" && <SessionsList events={filteredEvents} />}
+        {tab === "sessions" && (
+          <SessionsList
+            groupedEvents={groupedEvents}
+            availabilities={user.availabilities ?? {}}
+          />
+        )}
 
         {tab === "settings" && <Preferences collections={collections} />}
       </div>

@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { capitalise } from "@/lib/capitalise";
 import { formatName } from "@/lib/format-name";
 import { useIntranetStore } from "@/lib/store";
 import { useAuthActions } from "@convex-dev/auth/react";
@@ -45,25 +46,61 @@ export function Preferences({
 
   return (
     <>
-      <h2 className="border-b py-2 px-4 align-middle whitespace-nowrap font-semibold text-sm">
-        Profile
+      <h2
+        className="border-b py-2 px-4 align-middle whitespace-nowrap font-semibold text-sm sticky bg-background z-10"
+        style={{
+          top: "calc(env(safe-area-inset-top) + 56px)",
+        }}
+      >
+        Athlete Profile
       </h2>
 
       <div className="p-4 flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 text-sm">
           {user && (
-            <div>
-              <p>{formatName(user)}</p>
-              <p className="text-sm text-muted-foreground">{user.email}</p>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <p className="text-muted-foreground">Name</p>
+                <p>{formatName(user)}</p>
+              </div>
+
+              <div>
+                <p className="text-muted-foreground">Email</p>
+                <p>{user.email}</p>
+              </div>
+
+              {user.sidePreference && (
+                <div>
+                  <p className="text-muted-foreground">Side Preference</p>
+                  <p>{capitalise(user.sidePreference)}</p>
+                </div>
+              )}
+
+              {user.cox !== undefined && (
+                <div>
+                  <p className="text-muted-foreground">Cox</p>
+                  <p>{user.cox ? "Yes" : "No"}</p>
+                </div>
+              )}
+
+              {user.novice !== undefined && (
+                <div>
+                  <p className="text-muted-foreground">Novice</p>
+                  <p>{user.novice ? "Yes" : "No"}</p>
+                </div>
+              )}
             </div>
           )}
 
-          <div className="flex items-center flex-wrap gap-2">
-            {collections.map((collection) => (
-              <Badge key={collection._id} variant="outline">
-                {collection.title}
-              </Badge>
-            ))}
+          <div className="flex flex-col gap-2">
+            <p className="text-sm text-muted-foreground">My Collections</p>
+            <div className="flex items-center flex-wrap gap-2">
+              {collections.map((collection) => (
+                <Badge key={collection._id} variant="outline">
+                  {collection.title}
+                </Badge>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -72,7 +109,12 @@ export function Preferences({
         </Button>
       </div>
 
-      <h2 className="border-b py-2 px-4 align-middle whitespace-nowrap font-semibold text-sm">
+      <h2
+        className="border-b py-2 px-4 align-middle whitespace-nowrap font-semibold text-sm sticky bg-background z-10"
+        style={{
+          top: "calc(env(safe-area-inset-top) + 56px)",
+        }}
+      >
         Calendar
       </h2>
 
@@ -113,7 +155,12 @@ export function Preferences({
         </div>
       </div>
 
-      <h2 className="border-b py-2 px-4 align-middle whitespace-nowrap font-semibold text-sm">
+      <h2
+        className="border-b py-2 px-4 align-middle whitespace-nowrap font-semibold text-sm sticky bg-background z-10"
+        style={{
+          top: "calc(env(safe-area-inset-top) + 56px)",
+        }}
+      >
         View
       </h2>
 

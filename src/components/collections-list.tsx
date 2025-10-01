@@ -100,7 +100,12 @@ function CollectionsListSection({
 
   return (
     <div key={collection._id} className="flex flex-col first:pt-0 pt-4">
-      <div className="border-b py-2 px-4 flex justify-between">
+      <div
+        className="border-b py-2 px-4 flex justify-between sticky bg-background z-10"
+        style={{
+          top: "calc(env(safe-area-inset-top) + 56px)",
+        }}
+      >
         <h2 className="whitespace-nowrap font-semibold text-sm">
           {collection.title}
         </h2>
