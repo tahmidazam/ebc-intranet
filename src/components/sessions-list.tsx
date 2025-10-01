@@ -28,7 +28,7 @@ export function SessionsList({
         return (
           <div key={section.title} className="flex flex-col first:pt-0 pt-4">
             <div
-              className="border-b py-2 px-4 flex justify-between sticky bg-background z-10"
+              className="border-b py-2 px-4 flex items-center justify-between sticky bg-background z-10"
               style={{
                 top: "calc(env(safe-area-inset-top) + 100px)",
               }}
