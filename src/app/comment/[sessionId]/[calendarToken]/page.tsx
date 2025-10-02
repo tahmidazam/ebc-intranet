@@ -1,9 +1,9 @@
 "use client";
 
+import { CommentsList } from "@/components/comments-list";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useMutation, useQuery } from "convex/react";
-import { formatInTimeZone } from "date-fns-tz";
 import { Loader2Icon } from "lucide-react";
 import { use, useState } from "react";
 import { api } from "../../../../../convex/_generated/api";
@@ -32,9 +32,7 @@ export default function Comment({
 
   const [content, setContent] = useState("");
 
-  if (!resolvedToken) return <>Loading...</>;
-
-  if (!session || !comments)
+  if (!session || !comments || !resolvedToken)
     return (
       <main className="flex items-center justify-center h-screen w-full">
         <Loader2Icon className="animate-spin" />
@@ -67,19 +65,9 @@ export default function Comment({
         Post
       </Button>
 
-      {comments.map((comment) => (
-        <div key={comment._id}>
-          <div className="text-sm text-muted-foreground">
-            {comment.author} ·{" "}
-            {formatInTimeZone(
-              new Date(comment.timestamp),
-              "Europe/London",
-              "EEE MMM d, HH:mm"
-            )}
-          </div>
-          <div>{comment.content}</div>
-        </div>
-      ))}
+      <div className="flex flex-col">
+        <CommentsList comments={comments} />
+      </div>
     </div>
   );
 }
