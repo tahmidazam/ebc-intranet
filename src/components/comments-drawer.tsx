@@ -26,7 +26,6 @@ export function CommentsDrawer({
   const comments = useQuery(api.sessionComments.getBySession, {
     sessionId,
   });
-  const [isFocused, setIsFocused] = useState(false);
   const [comment, setComment] = useState("");
   const postComment = useMutation(api.sessionComments.postComment);
   const user = useQuery(api.user.currentUser);
