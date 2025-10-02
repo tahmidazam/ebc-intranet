@@ -10,40 +10,42 @@ export function CommentsList({
 }) {
   return (
     <>
-      {comments.map((comment) => {
-        const isDrive = isDriveLink(comment.content);
+      {comments
+        .sort((a, b) => a.timestamp - b.timestamp)
+        .map((comment) => {
+          const isDrive = isDriveLink(comment.content);
 
-        if (isDrive) {
-          return (
-            <div
-              key={comment._id}
-              className="flex flex-col gap-1 border-b px-4 py-2"
-            >
-              <div className="text-sm text-muted-foreground">
-                {comment.author} ·{" "}
-                {formatRelativeDate(new Date(comment.timestamp))}
+          if (isDrive) {
+            return (
+              <div
+                key={comment._id}
+                className="flex flex-col gap-1 border-b px-4 py-2"
+              >
+                <div className="text-sm text-muted-foreground">
+                  {comment.author} ·{" "}
+                  {formatRelativeDate(new Date(comment.timestamp))}
+                </div>
+                <DriveEmbed key={comment._id} link={comment.content} />
               </div>
-              <DriveEmbed key={comment._id} link={comment.content} />
-            </div>
-          );
-        } else {
-          return (
-            <div key={comment._id} className="border-b px-4 py-2">
-              <div className="text-sm text-muted-foreground">
-                {comment.author} ·{" "}
-                {formatRelativeDate(new Date(comment.timestamp))}
+            );
+          } else {
+            return (
+              <div key={comment._id} className="border-b px-4 py-2">
+                <div className="text-sm text-muted-foreground">
+                  {comment.author} ·{" "}
+                  {formatRelativeDate(new Date(comment.timestamp))}
+                </div>
+                <div className="flex flex-col gap-2">
+                  {comment.content.split(/  /g).map((line, index) => (
+                    <p key={index} className="whitespace-pre-line">
+                      {line}
+                    </p>
+                  ))}
+                </div>
               </div>
-              <div className="flex flex-col gap-2">
-                {comment.content.split(/  /g).map((line, index) => (
-                  <p key={index} className="whitespace-pre-line">
-                    {line}
-                  </p>
-                ))}
-              </div>
-            </div>
-          );
-        }
-      })}
+            );
+          }
+        })}
     </>
   );
 }
