@@ -1,10 +1,12 @@
 import { formatRelativeDate } from "@/lib/format-relative-date";
+import { isDriveLink } from "@/lib/is-drive-link";
 import { cn } from "@/lib/utils";
 import { useMutation, useQuery } from "convex/react";
 import { ArrowUp, Loader2Icon, MessageCircle, X } from "lucide-react";
 import { useState } from "react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
+import DriveEmbed from "./drive-embed";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import {
@@ -95,15 +97,31 @@ export function CommentsDrawer({
             }}
           >
             {comments ? (
-              comments.map((comment) => (
-                <div key={comment._id}>
-                  <div className="text-sm text-muted-foreground">
-                    {comment.author} ·{" "}
-                    {formatRelativeDate(new Date(comment.timestamp))}
-                  </div>
-                  <div>{comment.content}</div>
-                </div>
-              ))
+              comments.map((comment) => {
+                const isDrive = isDriveLink(comment.content);
+
+                if (isDrive) {
+                  return (
+                    <div key={comment._id} className="flex flex-col gap-1">
+                      <div className="text-sm text-muted-foreground">
+                        {comment.author} ·{" "}
+                        {formatRelativeDate(new Date(comment.timestamp))}
+                      </div>
+                      <DriveEmbed key={comment._id} link={comment.content} />
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div key={comment._id}>
+                      <div className="text-sm text-muted-foreground">
+                        {comment.author} ·{" "}
+                        {formatRelativeDate(new Date(comment.timestamp))}
+                      </div>
+                      <div>{comment.content}</div>
+                    </div>
+                  );
+                }
+              })
             ) : (
               <div className="flex items-center justify-center flex-grow w-full">
                 <Loader2Icon className="animate-spin" />
