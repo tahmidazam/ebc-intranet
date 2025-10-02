@@ -130,7 +130,9 @@ export function SessionsList({
                     </div>
                   )}
 
-                  <CommentsDrawer sessionId={event.id as Id<"sessions">} />
+                  <div className="flex gap-2">
+                    <CommentsDrawer sessionId={event.id as Id<"sessions">} />
+                  </div>
                 </div>
               ))}
             </div>
