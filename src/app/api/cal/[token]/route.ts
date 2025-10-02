@@ -91,15 +91,16 @@ export async function GET(
     });
 
     // Convert sessions to events using the extracted function
-    const events = sessionsToICalEventData(
+    const events = sessionsToICalEventData({
       sessions,
-      usersArray.filter((user): user is Doc<"users"> => user !== null),
-      collectionsArray.filter(
+      users: usersArray.filter((user): user is Doc<"users"> => user !== null),
+      collections: collectionsArray.filter(
         (collection): collection is Doc<"collections"> => collection !== null
       ),
-      id,
-      coach
-    );
+      currentUserId: id,
+      coach,
+      token,
+    });
 
     // Add events to calendar
     events.forEach((event) => {

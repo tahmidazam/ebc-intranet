@@ -11,16 +11,23 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  
+
   try {
-    const collection = await fetchQuery(api.collections.getById, { id: id as Id<"collections"> });
+    const collection = await fetchQuery(api.collections.getById, {
+      id: id as Id<"collections">,
+    });
 
     if (!collection) {
-      return NextResponse.json({ message: "Collection not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Collection not found" },
+        { status: 404 }
+      );
     }
 
     // Single query for sessions
-    const sessions = await fetchQuery(api.sessions.getByCollection, { collectionId: id as Id<"collections"> })
+    const sessions = await fetchQuery(api.sessions.getByCollection, {
+      collectionId: id as Id<"collections">,
+    });
 
     if (!sessions?.length) {
       return NextResponse.json(
@@ -50,10 +57,10 @@ export async function GET(
 
     // Batch fetch all required data
     const usersArray = await Promise.all(
-        Array.from(userIds).map((uid) =>
-          fetchQuery(api.user.getById, { id: uid as Id<"users"> })
-        )
+      Array.from(userIds).map((uid) =>
+        fetchQuery(api.user.getById, { id: uid as Id<"users"> })
       )
+    );
 
     // Create calendar
     const calendar = ical({
@@ -61,11 +68,11 @@ export async function GET(
     });
 
     // Convert sessions to events using the extracted function
-    const events = sessionsToICalEventData(
+    const events = sessionsToICalEventData({
       sessions,
-      usersArray.filter((user): user is Doc<"users"> => user !== null),
-      [collection],
-    );
+      users: usersArray.filter((user): user is Doc<"users"> => user !== null),
+      collections: [collection],
+    });
 
     // Add events to calendar
     events.forEach((event) => {

@@ -1,16 +1,23 @@
 import { SEAT_KEYS, SEAT_LABELS } from "@/schemas/seat";
 import { ICalEventData } from "ical-generator";
 import { Doc } from "../../convex/_generated/dataModel";
-import { encodeName } from "./coach-name-encryption";
 import { formatName } from "./format-name";
 
-export function sessionsToICalEventData(
-  sessions: Doc<"sessions">[],
-  users: Doc<"users">[],
-  collections: Doc<"collections">[],
-  currentUserId?: string,
-  coach?: boolean
-): ICalEventData[] {
+export function sessionsToICalEventData({
+  sessions,
+  users,
+  collections,
+  currentUserId,
+  coach,
+  token,
+}: {
+  sessions: Doc<"sessions">[];
+  users: Doc<"users">[];
+  collections: Doc<"collections">[];
+  currentUserId?: string;
+  coach?: boolean;
+  token?: string;
+}): ICalEventData[] {
   // Create lookup maps
   const usersMap = users.reduce((map, user) => {
     if (user) map[user._id] = formatName(user) ?? "";
@@ -26,20 +33,19 @@ export function sessionsToICalEventData(
   return sessions.map((session) => {
     const start = new Date(session.timestamp);
     const end = new Date(session.timestamp + session.duration * 60 * 1000);
-    
+
     // Helper function to get user's seat in a session
     const getUserSeat = (userId: string): string | null => {
-      const seatIndex = SEAT_KEYS.findIndex(key => session[key] === userId);
+      const seatIndex = SEAT_KEYS.findIndex((key) => session[key] === userId);
       return seatIndex !== -1 ? SEAT_LABELS[seatIndex] : null;
     };
 
     // Helper function to build crew list
     const buildCrewList = (): string => {
-      return SEAT_LABELS
-        .map((seatName, index) => {
-          const userId = session[SEAT_KEYS[index]];
-          return userId ? `${seatName}: ${usersMap[userId] || "Unknown"}` : null;
-        })
+      return SEAT_LABELS.map((seatName, index) => {
+        const userId = session[SEAT_KEYS[index]];
+        return userId ? `${seatName}: ${usersMap[userId] || "Unknown"}` : null;
+      })
         .filter(Boolean)
         .join("\n");
     };
@@ -52,21 +58,29 @@ export function sessionsToICalEventData(
       start,
       end,
       id: session._id,
-      summary: `${coach ? "Coaching: " : ""}${collectionTitle} ${session.type.charAt(0).toUpperCase() + session.type.slice(1)} session`,
+      summary: `${coach ? "Coaching: " : ""}${collectionTitle} ${
+        session.type.charAt(0).toUpperCase() + session.type.slice(1)
+      } session`,
       description: [
-      ...(session.boat ? [`Boat: ${session.boat}`] : []),
-      ...(session.course ? [`Course: ${session.course}`] : []),
-      ...(session.distance ? [`Distance: ${session.distance} km`] : []),
-      ``,
-      ...(session.coach ? [`Coach: ${session.coach}`] : []),
-      ...(currentUserId ? [`Your seat: ${userSeat || "N/A"}`, ``] : []),
-      `Crew:`,
-      crewList,
-      ``,
-      `Outline: ${session.outline}`,
-      ``,
-      ...((session.coach || currentUserId) ? [`Comment on this session: https://intranet.emmabc.org/comment/${session._id}${coach && session.coach ? `?coach=${encodeName(session.coach)}` : currentUserId ? `?userId=${currentUserId}` : ""}`] : []),
-      ].join("\n").trim(),
+        ...(session.boat ? [`Boat: ${session.boat}`] : []),
+        ...(session.course ? [`Course: ${session.course}`] : []),
+        ...(session.distance ? [`Distance: ${session.distance} km`] : []),
+        ``,
+        ...(session.coach ? [`Coach: ${session.coach}`] : []),
+        ...(currentUserId ? [`Your seat: ${userSeat || "N/A"}`, ``] : []),
+        `Crew:`,
+        crewList,
+        ``,
+        `Outline: ${session.outline}`,
+        ``,
+        ...(session.coach || currentUserId
+          ? [
+              `Comment on this session: https://intranet.emmabc.org/comment/${session._id}/${token}`,
+            ]
+          : []),
+      ]
+        .join("\n")
+        .trim(),
       location: "Emmanuel Boathouse, Cutter Ferry Ln, Cambridge, CB4 1JR",
     };
   });

@@ -18,6 +18,7 @@ import type * as auth from "../auth.js";
 import type * as calendarTokens from "../calendarTokens.js";
 import type * as collectionMembers from "../collectionMembers.js";
 import type * as collections from "../collections.js";
+import type * as formatName from "../formatName.js";
 import type * as http from "../http.js";
 import type * as links from "../links.js";
 import type * as sessionComments from "../sessionComments.js";
@@ -38,6 +39,7 @@ declare const fullApi: ApiFromModules<{
   calendarTokens: typeof calendarTokens;
   collectionMembers: typeof collectionMembers;
   collections: typeof collections;
+  formatName: typeof formatName;
   http: typeof http;
   links: typeof links;
   sessionComments: typeof sessionComments;
