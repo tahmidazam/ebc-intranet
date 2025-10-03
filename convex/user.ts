@@ -10,6 +10,21 @@ export const collect = query({
   },
 });
 
+export const updateEventOffset = mutation({
+  args: {
+    eventOffset: v.optional(v.number()),
+  },
+  handler: async (ctx, { eventOffset }) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      throw new Error("Not authenticated");
+    }
+
+    await ctx.db.patch(userId, { eventOffset });
+  },
+});
+
 export const currentUser = query({
   args: {},
   handler: async (ctx) => {

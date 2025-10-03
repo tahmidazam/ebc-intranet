@@ -6,18 +6,26 @@ import { capitalise } from "@/lib/capitalise";
 import { formatName } from "@/lib/format-name";
 import { useIntranetStore } from "@/lib/store";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { CircleAlert } from "lucide-react";
 import { useShallow } from "zustand/shallow";
 import { api } from "../../convex/_generated/api";
 import { Doc } from "../../convex/_generated/dataModel";
 import { CalendarUrlP } from "./calendar-url-p";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 export function Preferences({
   collections,
 }: {
   collections: Doc<"collections">[];
 }) {
   const user = useQuery(api.user.currentUser);
+  const updateEventOffset = useMutation(api.user.updateEventOffset);
   const { signOut } = useAuthActions();
   const showEmptyCollections = useIntranetStore(
     useShallow((state) => state.showEmptyCollections)
@@ -119,6 +127,56 @@ export function Preferences({
       </h2>
 
       <div className="p-4 flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <Label>Offset</Label>
+          <Select
+            value={
+              user?.eventOffset === undefined
+                ? "undefined"
+                : `${user.eventOffset / 60}`
+            }
+            onValueChange={async (value) => {
+              if (value === "undefined") {
+                await updateEventOffset({
+                  eventOffset: undefined,
+                });
+              } else {
+                const minutes = parseInt(value, 10);
+                if (!isNaN(minutes)) {
+                  await updateEventOffset({
+                    eventOffset: minutes * 60,
+                  });
+                }
+              }
+            }}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select an offset..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="undefined">No offset</SelectItem>
+              <SelectItem value="5">5 min</SelectItem>
+              <SelectItem value="10">10 min</SelectItem>
+              <SelectItem value="15">15 min</SelectItem>
+              <SelectItem value="20">20 min</SelectItem>
+              <SelectItem value="25">25 min</SelectItem>
+              <SelectItem value="30">30 min</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {user?.eventOffset ? (
+          <p className="text-sm text-muted-foreground">
+            Your calendar events will begin {`${user.eventOffset / 60} min`}{" "}
+            before the planned session time.
+          </p>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            Select an offset to have events appear earlier than their scheduled
+            time in your calendar.
+          </p>
+        )}
+
         {user?._id && (
           <CalendarUrlP id={user._id} className="break-all text-xs font-mono" />
         )}

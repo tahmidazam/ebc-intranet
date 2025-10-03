@@ -10,6 +10,7 @@ export function sessionsToICalEventData({
   currentUserId,
   coach,
   token,
+  eventOffset,
 }: {
   sessions: Doc<"sessions">[];
   users: Doc<"users">[];
@@ -17,6 +18,7 @@ export function sessionsToICalEventData({
   currentUserId?: string;
   coach?: boolean;
   token?: string;
+  eventOffset?: number;
 }): ICalEventData[] {
   // Create lookup maps
   const usersMap = users.reduce((map, user) => {
@@ -31,7 +33,7 @@ export function sessionsToICalEventData({
 
   // Convert sessions to events
   return sessions.map((session) => {
-    const start = new Date(session.timestamp);
+    const start = new Date(session.timestamp - (eventOffset ?? 0) * 1000);
     const end = new Date(session.timestamp + session.duration * 60 * 1000);
 
     // Helper function to get user's seat in a session
@@ -77,6 +79,10 @@ export function sessionsToICalEventData({
           ? [
               `Comment on this session: https://intranet.emmabc.org/comment/${session._id}/${token}`,
             ]
+          : []),
+        ``,
+        ...(eventOffset
+          ? [`N.B., event times adjusted earlier by ${eventOffset / 60} min.`]
           : []),
       ]
         .join("\n")

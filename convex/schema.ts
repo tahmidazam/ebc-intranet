@@ -23,6 +23,7 @@ export default defineSchema({
     cox: v.optional(v.boolean()),
     novice: v.optional(v.boolean()),
     availabilities: v.optional(v.record(v.string(), v.string())),
+    eventOffset: v.optional(v.number()),
   }).index("email", ["email"]),
   collections: defineTable({
     title: v.string(),

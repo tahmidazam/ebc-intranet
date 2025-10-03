@@ -100,6 +100,7 @@ export async function GET(
       currentUserId: id,
       coach,
       token,
+      eventOffset: user?.eventOffset
     });
 
     // Add events to calendar
