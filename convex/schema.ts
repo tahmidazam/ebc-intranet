@@ -60,6 +60,7 @@ export default defineSchema({
     three: v.optional(v.id("users")),
     two: v.optional(v.id("users")),
     bow: v.optional(v.id("users")),
+    read: v.optional(v.array(v.string()))
   })
     .index("collectionId", ["collectionId"])
     .index("cox", ["cox"])

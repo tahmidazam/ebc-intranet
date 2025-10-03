@@ -13,7 +13,11 @@ export const eventSchema = z.object({
     distance: z.number().optional(),
     coachName: z.string().optional(),
     outline: z.string().optional(),
-    seats: z.record(z.string(), z.string().nullable()),
+    seats: z.record(z.string(), z.object({
+        name: z.string(),
+        id: z.string(),
+    })),
     userSeat: z.string().nullable().optional(),
+    read: z.array(z.string()),
 });
 export type Event = z.infer<typeof eventSchema>;

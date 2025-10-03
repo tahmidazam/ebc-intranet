@@ -198,3 +198,16 @@ export const deleteSessions = mutation({
     await Promise.all(args.ids.map((sessionId) => ctx.db.delete(sessionId)));
   },
 });
+
+export const markAsRead = mutation({
+  args: { id: v.id("sessions"), existing: v.array(v.string()) },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (userId === null) {
+      throw new Error("Not authenticated");
+    }
+    await ctx.db.patch(args.id, {
+      read: [...args.existing, userId]
+    });
+  },
+})

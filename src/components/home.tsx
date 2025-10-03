@@ -29,6 +29,7 @@ import { CalendarSyncButton } from "./calendar-sync-button";
 import { SessionsList } from "./sessions-list";
 import { TabBar } from "./tab-bar";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
+import { groupEventsByDay } from "@/lib/group-events-by-day";
 
 export function Home() {
   const collections = useQuery(api.collections.getUserCollectionsWithLinks);
@@ -61,9 +62,9 @@ export function Home() {
 
     const now = new Date();
     if (sessionsToDisplay === "upcoming") {
-      return events.filter((event) => event.end > now);
+      return groupEventsByDay(events.filter((event) => event.end > now));
     } else {
-      return events.filter((event) => event.end <= now);
+      return groupEventsByDay(events.filter((event) => event.end <= now));
     }
   }, [queryResult, user, sessionsToDisplay]);
 
@@ -207,7 +208,7 @@ export function Home() {
 
         {tab === "sessions" && (
           <SessionsList
-            events={events}
+            groupedEvents={events}
             availabilities={user.availabilities ?? {}}
           />
         )}
