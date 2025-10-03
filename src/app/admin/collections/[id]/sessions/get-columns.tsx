@@ -7,6 +7,8 @@ import { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import Link from "next/link";
 import { Doc, Id } from "../../../../../../convex/_generated/dataModel";
+import React from "react";
+import { CircleCheck, CircleQuestionMark } from "lucide-react";
 
 export const getColumns = (
   users: Doc<"users">[],
@@ -94,6 +96,21 @@ export const getColumns = (
         "bow",
       ] as const;
 
+      const seatPropMap: Record<
+        (typeof seatOrder)[number],
+        keyof typeof row.original
+      > = {
+        cox: "cox",
+        stroke: "stroke",
+        "7": "seven",
+        "6": "six",
+        "5": "five",
+        "4": "four",
+        "3": "three",
+        "2": "two",
+        bow: "bow",
+      };
+
       const seats = {
         cox: users.find((u) => u._id === row.original.cox),
         stroke: users.find((u) => u._id === row.original.stroke),
@@ -107,15 +124,23 @@ export const getColumns = (
       };
 
       return (
-        <div className="flex flex-col ">
+        <div className="grid grid-cols-[auto_1fr_auto] gap-x-2 auto-rows-min items-center">
           {seatOrder.map((seat) => {
             const user = seats[seat];
             if (!user) return null;
+            const seatId = row.original[seatPropMap[seat]];
             return (
-              <div key={seat} className="flex flex-row justify-between">
-                <p className="text-muted-foreground pr-8">{capitalise(seat)}</p>
+              <React.Fragment key={seat}>
+                <p className="text-muted-foreground">{capitalise(seat)}</p>
                 <p>{formatName(user)}</p>
-              </div>
+                {seatId &&
+                typeof seatId === "string" &&
+                row.original.read?.includes(seatId) ? (
+                  <CircleCheck className="size-4 text-green-500" />
+                ) : (
+                  <CircleQuestionMark className="size-4 text-muted-foreground" />
+                )}
+              </React.Fragment>
             );
           })}
         </div>

@@ -54,7 +54,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   );
 
   const table = useReactTable({
-    data: sessions ?? [],
+    data: sessions?.sort((a, b) => a.timestamp - b.timestamp) ?? [],
     columns,
     onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
