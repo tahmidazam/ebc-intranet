@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { capitalise } from "@/lib/capitalise";
-import { groupEventsByDay } from "@/lib/group-events-by-day";
 import { sessionsToResolvedEvents } from "@/lib/sessions-to-events";
 import { useIntranetStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -51,7 +50,7 @@ export function Home() {
 
   const queryResult = useQuery(api.sessions.getByCurrentUser);
 
-  const groupedEvents = useMemo(() => {
+  const events = useMemo(() => {
     if (!queryResult || !user) return null;
     const events = sessionsToResolvedEvents(
       queryResult.sessions,
@@ -62,13 +61,13 @@ export function Home() {
 
     const now = new Date();
     if (sessionsToDisplay === "upcoming") {
-      return groupEventsByDay(events.filter((event) => event.end > now));
+      return events.filter((event) => event.end > now);
     } else {
-      return groupEventsByDay(events.filter((event) => event.end <= now));
+      return events.filter((event) => event.end <= now);
     }
   }, [queryResult, user, sessionsToDisplay]);
 
-  if (!collections || !user || !groupedEvents) {
+  if (!collections || !user || !events) {
     return (
       <main className="flex items-center justify-center h-screen w-full">
         <Loader2Icon className="animate-spin" />
@@ -208,7 +207,7 @@ export function Home() {
 
         {tab === "sessions" && (
           <SessionsList
-            groupedEvents={groupedEvents}
+            events={events}
             availabilities={user.availabilities ?? {}}
           />
         )}
