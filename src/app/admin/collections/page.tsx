@@ -65,7 +65,7 @@ export default function Collections() {
 
   return (
     <main className="w-full flex flex-col h-screen overflow-auto">
-      <header className="flex flex-row items-center p-2 justify-between">
+      <header className="flex flex-row items-center p-2 justify-between sticky">
         <div className="flex flex-row items-center gap-4">
           <SidebarTrigger variant="outline" className="rounded-full" />
 

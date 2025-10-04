@@ -8,13 +8,6 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   Table,
@@ -24,12 +17,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatName } from "@/lib/format-name";
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 import { useMutation, useQuery } from "convex/react";
-import { Loader2Icon, PlusIcon } from "lucide-react";
+import { Loader2Icon } from "lucide-react";
 import { useState } from "react";
 import { api } from "../../../../../convex/_generated/api";
 import { Id } from "../../../../../convex/_generated/dataModel";
+import { collectionColumns } from "./collection-columns";
+import { memberColumns } from "./member-columns";
 
 export default function Page() {
   const collections = useQuery(api.collections.get);
@@ -38,27 +37,28 @@ export default function Page() {
     api.collectionMembers.updateAccessToCollectionsForGroup
   );
 
-  const [selectedClerkId, setSelectedClerkId] = useState<string | undefined>(
-    undefined
-  );
-  const [selectedCollectionId, setSelectedCollectionId] = useState<
-    string | undefined
-  >(undefined);
+  const [memberRowSelection, setMemberRowSelection] = useState({});
+  const [collectionRowSelection, setCollectionRowSelection] = useState({});
 
-  const [selectedClerkIds, setSelectedClerkIds] = useState<string[]>([]);
-  const [selectedCollectionIds, setSelectedCollectionIds] = useState<string[]>(
-    []
-  );
+  const membersTable = useReactTable({
+    data: members ?? [],
+    columns: memberColumns,
+    onRowSelectionChange: setMemberRowSelection,
+    getCoreRowModel: getCoreRowModel(),
+    state: {
+      rowSelection: memberRowSelection,
+    },
+  });
 
-  const selectableCollections = collections
-    ? collections.filter(
-        (collection) => !selectedCollectionIds.includes(collection._id)
-      )
-    : [];
-
-  const selectableMembers = members
-    ? members.filter((member) => !selectedClerkIds.includes(member._id))
-    : [];
+  const collectionsTable = useReactTable({
+    data: collections ?? [],
+    columns: collectionColumns,
+    onRowSelectionChange: setCollectionRowSelection,
+    getCoreRowModel: getCoreRowModel(),
+    state: {
+      rowSelection: collectionRowSelection,
+    },
+  });
 
   if (!collections || !members)
     return (
@@ -95,15 +95,19 @@ export default function Page() {
             className="rounded-full"
             onClick={() => {
               updateAccessToCollectionsForGroup({
-                userIds: selectedClerkIds,
-                collectionIds: selectedCollectionIds as Id<"collections">[],
+                userIds: membersTable
+                  .getSelectedRowModel()
+                  .rows.map((row) => row.original._id),
+                collectionIds: collectionsTable
+                  .getSelectedRowModel()
+                  .rows.map((row) => row.original._id) as Id<"collections">[],
               });
-              setSelectedClerkIds([]);
-              setSelectedCollectionIds([]);
+              membersTable.resetRowSelection();
+              collectionsTable.resetRowSelection();
             }}
             disabled={
-              selectedClerkIds.length === 0 ||
-              selectedCollectionIds.length === 0
+              membersTable.getSelectedRowModel().rows.length === 0 ||
+              collectionsTable.getSelectedRowModel().rows.length === 0
             }
           >
             Update Access
@@ -111,146 +115,116 @@ export default function Page() {
         </div>
       </header>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="flex flex-col gap-4">
-          <div className="flex gap-2 pl-2">
-            <Select
-              value={selectedClerkId}
-              onValueChange={setSelectedClerkId}
-              disabled={selectableMembers.length === 0}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Member" />
-              </SelectTrigger>
-              <SelectContent>
-                {selectableMembers.map((member) => (
-                  <SelectItem key={member._id} value={member._id}>
-                    {formatName(member)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Button
-              variant="outline"
-              size="icon"
-              className="rounded-full"
-              disabled={!selectedClerkId}
-              onClick={() => {
-                if (selectedClerkId) {
-                  setSelectedClerkIds((prev) => [...prev, selectedClerkId]);
-                  setSelectedClerkId(undefined);
-                }
-              }}
-            >
-              <PlusIcon />
-            </Button>
-          </div>
-
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Selected Member</TableHead>
+      <div className="grid grid-cols-2 gap-4 overflow-y-scroll">
+        <Table>
+          <TableHeader className="sticky top-0 z-10 bg-background">
+            {membersTable.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className={header.column.columnDef.meta?.className}
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {selectedClerkIds.map((userId) => (
-                <TableRow key={userId}>
-                  <TableCell className="w-full">
-                    {(() => {
-                      const member = members.find(
-                        (member) => member._id === userId
-                      );
-                      return member ? formatName(member) : null;
-                    })()}
-                  </TableCell>
-
-                  <TableCell
-                    className="underline underline-offset-4 decoration-border cursor-pointer"
-                    onClick={() => {
-                      setSelectedClerkIds((prev) =>
-                        prev.filter((id) => id !== userId)
-                      );
-                    }}
-                  >
-                    Remove
-                  </TableCell>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {membersTable.getRowModel().rows?.length ? (
+              membersTable.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      className={cell.column.columnDef.meta?.className}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <div className="flex gap-2 pr-2">
-            <Select
-              value={selectedCollectionId}
-              onValueChange={setSelectedCollectionId}
-              disabled={selectableCollections.length === 0}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Collection" />
-              </SelectTrigger>
-              <SelectContent>
-                {selectableCollections.map((collection) => (
-                  <SelectItem key={collection._id} value={collection._id}>
-                    {collection.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Button
-              variant="outline"
-              size="icon"
-              className="rounded-full"
-              disabled={!selectedCollectionId}
-              onClick={() => {
-                if (selectedCollectionId) {
-                  setSelectedCollectionIds((prev) => [
-                    ...prev,
-                    selectedCollectionId,
-                  ]);
-                  setSelectedCollectionId(undefined);
-                }
-              }}
-            >
-              <PlusIcon />
-            </Button>
-          </div>
-
-          <Table>
-            <TableHeader>
+              ))
+            ) : (
               <TableRow>
-                <TableHead>Selected Collection</TableHead>
+                <TableCell
+                  colSpan={memberColumns.length}
+                  className="h-24 text-center text-muted-foreground"
+                >
+                  No members found.
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {selectedCollectionIds.map((collectionId) => (
-                <TableRow key={collectionId}>
-                  <TableCell className="w-full">
-                    {
-                      collections.find(
-                        (collection) => collection._id === collectionId
-                      )?.title
-                    }
-                  </TableCell>
+            )}
+          </TableBody>
+        </Table>
 
-                  <TableCell
-                    className="underline underline-offset-4 decoration-border cursor-pointer"
-                    onClick={() => {
-                      setSelectedCollectionIds((prev) =>
-                        prev.filter((id) => id !== collectionId)
-                      );
-                    }}
-                  >
-                    Remove
-                  </TableCell>
+        <Table>
+          <TableHeader className="sticky top-0 z-10 bg-background">
+            {collectionsTable.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className={header.column.columnDef.meta?.className}
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {collectionsTable.getRowModel().rows?.length ? (
+              collectionsTable.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      className={cell.column.columnDef.meta?.className}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={collectionColumns.length}
+                  className="h-24 text-center text-muted-foreground"
+                >
+                  No collections found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
     </main>
   );
