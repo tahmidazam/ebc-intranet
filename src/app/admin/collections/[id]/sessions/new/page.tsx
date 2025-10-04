@@ -39,6 +39,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { formatName } from "@/lib/format-name";
 import { resolveAvailabilities } from "@/lib/resolve-availabilities";
 import { cn } from "@/lib/utils";
@@ -46,7 +51,7 @@ import { BOATS } from "@/schemas/boat";
 import { COURSE_CASES } from "@/schemas/course";
 import { useMutation, useQuery } from "convex/react";
 import { format } from "date-fns";
-import { FolderSync, Loader2Icon } from "lucide-react";
+import { CircleAlert, FolderSync, Loader2Icon } from "lucide-react";
 import Link from "next/link";
 import { use, useMemo, useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
@@ -54,6 +59,37 @@ import { toast } from "sonner";
 import z from "zod";
 import { api } from "../../../../../../../convex/_generated/api";
 import { Doc, Id } from "../../../../../../../convex/_generated/dataModel";
+
+function validateSeatAssignment(
+  athlete: Doc<"users"> | undefined,
+  seat: string
+): string | null {
+  if (!athlete) return null;
+
+  const isCoxSeat = seat === "cox";
+
+  // Cox/non-cox seat validation
+  if (athlete.cox && !isCoxSeat) {
+    return "A cox is in a non-cox seat";
+  }
+  if (!athlete.cox && isCoxSeat) {
+    return "A non-cox in a cox seat";
+  }
+
+  // Side preference validation
+  const bowsideSeats = ["bow", "3", "5", "7"];
+  const strokesideSeats = ["stroke", "2", "4", "6"];
+
+  if (athlete.sidePreference === "strokeside" && bowsideSeats.includes(seat)) {
+    return "Strokeside athlete in a bowside seat";
+  }
+
+  if (athlete.sidePreference === "bowside" && strokesideSeats.includes(seat)) {
+    return "Bowside athlete in a strokeside seat";
+  }
+
+  return null;
+}
 
 const SEAT_CASES = ["cox", "stroke", "7", "6", "5", "4", "3", "2", "bow"];
 export default function ResolveAvailabilitiesPage({
@@ -190,8 +226,8 @@ export default function ResolveAvailabilitiesPage({
                 collectionId: z.string(),
                 boat: z.string().optional(),
                 configuration: z.enum(["8+", "4+"]),
-                course: z.string(),
-                distance: z.number(),
+                course: z.string().optional(),
+                distance: z.number().optional(),
                 coach: z.string().optional(),
                 athletes: z.record(z.string(), z.string()),
               });
@@ -428,6 +464,7 @@ export default function ResolveAvailabilitiesPage({
                       <TableHead>Seat</TableHead>
                       <TableHead>Athlete</TableHead>
                       <TableHead></TableHead>
+                      <TableHead></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -457,6 +494,29 @@ export default function ResolveAvailabilitiesPage({
                                   : "Unassigned";
                               })()
                             : "Unassigned"}
+                        </TableCell>
+
+                        <TableCell>
+                          {(() => {
+                            const athlete = allUsers.find(
+                              (user) => user._id === athletes[seat]
+                            );
+                            const validationError = validateSeatAssignment(
+                              athlete,
+                              seat
+                            );
+                            if (!validationError) return null;
+                            return (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <CircleAlert className="text-yellow-500 size-5" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>{validationError}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            );
+                          })()}
                         </TableCell>
 
                         <TableCell

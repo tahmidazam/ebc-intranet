@@ -22,6 +22,8 @@ export async function updateSessions(
 
   const sheet = doc.sheetsByTitle[sheetName];
 
+  await sheet.clearRows();
+
   await sheet.setHeaderRow([
     "date",
     "time",
