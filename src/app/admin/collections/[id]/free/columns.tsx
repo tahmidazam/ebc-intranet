@@ -10,6 +10,10 @@ export const columns: ColumnDef<{
     accessorKey: "key",
   },
   {
+    header: "Athletes",
+    accessorFn: (row) => row.values.length,
+  },
+  {
     header: "Resolved",
     accessorFn: (row) => row.resolved.join(", "),
     meta: {
