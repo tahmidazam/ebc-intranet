@@ -73,6 +73,19 @@ export const columns: ColumnDef<Doc<"collections">>[] = [
     },
   },
   {
+    id: "free",
+    cell: ({ row }) => {
+      return (
+        <Link
+          className="underline underline-offset-4 decoration-border"
+          href={`/admin/collections/${row.original._id}/free`}
+        >
+          View Free Intervals
+        </Link>
+      );
+    },
+  },
+  {
     id: "calendar",
     cell: ({ row }) => {
       return (

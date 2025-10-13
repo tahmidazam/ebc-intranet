@@ -59,7 +59,6 @@ function sessionsToBusyIntervals(
     });
 }
 
-
 export function resolveAvailabilities(
   users: Doc<"users">[],
   sessions: Doc<"sessions">[],
