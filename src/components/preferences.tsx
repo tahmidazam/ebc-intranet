@@ -80,14 +80,14 @@ export function Preferences({
               {user.phone && (
                 <div>
                   <p className="text-muted-foreground">Phone Number</p>
-                  <p>{capitalise(user.phone)}</p>
+                  <p>{user.phone}</p>
                 </div>
               )}
 
               {user.side && (
                 <div>
                   <p className="text-muted-foreground">Men/Women</p>
-                  <p>{user.side}</p>
+                  <p>{capitalise(user.side)}</p>
                 </div>
               )}
 
