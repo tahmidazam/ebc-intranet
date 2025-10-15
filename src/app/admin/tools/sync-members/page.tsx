@@ -30,11 +30,11 @@ export default function SyncMembersPage() {
 
     try {
       setLoading(true);
-      const formData = new FormData(e.currentTarget);
-      const docId = formData.get("docId") as string;
-      const sheetTitle = formData.get("sheetTitle") as string;
 
-      const csv = await getAvailabilitiesFromSheet(docId, sheetTitle);
+      const csv = await getAvailabilitiesFromSheet(
+        "1swwFSMeQBNK-EzOVvoa6WPUSmLc1o5qYQ2hhflmnwEw",
+        "Availabilities"
+      );
       setCsv(csv);
     } catch (error) {
       console.error(error);
@@ -55,7 +55,7 @@ export default function SyncMembersPage() {
   const handleSync = async () => {
     if (!csv) return;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const membersWithoutCrsid = csv.map(({ crsid, phone, ...rest }) => rest);
+    const membersWithoutCrsid = csv.map(({ crsid, ...rest }) => rest);
     await syncSheetMembers({
       members: membersWithoutCrsid,
     });
@@ -127,26 +127,6 @@ export default function SyncMembersPage() {
             onSubmit={handleSubmit}
             className="flex flex-col gap-4 max-w-sm mx-auto w-full"
           >
-            <div className="grid w-full max-w-sm items-center gap-2">
-              <Label htmlFor="docId">Google Sheet Document ID</Label>
-              <Input
-                type="text"
-                name="docId"
-                className="rounded-full"
-                defaultValue="1swwFSMeQBNK-EzOVvoa6WPUSmLc1o5qYQ2hhflmnwEw"
-              />
-            </div>
-
-            <div className="grid w-full max-w-sm items-center gap-2">
-              <Label htmlFor="sheetTitle">Sheet Title</Label>
-              <Input
-                type="text"
-                name="sheetTitle"
-                defaultValue="Availabilities"
-                className="rounded-full"
-              />
-            </div>
-
             <Button type="submit" className="rounded-full" variant="outline">
               Read Sheet
             </Button>

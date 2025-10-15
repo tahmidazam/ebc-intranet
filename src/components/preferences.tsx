@@ -77,6 +77,34 @@ export function Preferences({
                 <p>{user.email}</p>
               </div>
 
+              {user.phone && (
+                <div>
+                  <p className="text-muted-foreground">Phone Number</p>
+                  <p>{capitalise(user.phone)}</p>
+                </div>
+              )}
+
+              {user.side && (
+                <div>
+                  <p className="text-muted-foreground">Men/Women</p>
+                  <p>{user.side}</p>
+                </div>
+              )}
+
+              {user.degree && (
+                <div>
+                  <p className="text-muted-foreground">Degree/Program</p>
+                  <p>{user.degree}</p>
+                </div>
+              )}
+
+              {user.degree && (
+                <div>
+                  <p className="text-muted-foreground">Year</p>
+                  <p>{user.degreeYear}</p>
+                </div>
+              )}
+
               {user.sidePreference && (
                 <div>
                   <p className="text-muted-foreground">Side Preference</p>

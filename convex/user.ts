@@ -139,6 +139,12 @@ export const syncSheetMembers = mutation({
         cox: v.boolean(),
         novice: v.boolean(),
         availabilities: v.record(v.string(), v.string()),
+        side: v.optional(
+          v.union(v.literal("women"), v.literal("men"), v.literal("both"))
+        ),
+        degree: v.optional(v.string()),
+        phone: v.optional(v.string()),
+        degreeYear: v.optional(v.string()),
       })
     ),
   },
@@ -162,6 +168,18 @@ export const syncSheetMembers = mutation({
         if (existing.novice !== member.novice) {
           updates.novice = member.novice;
         }
+        if (existing.side !== member.side) {
+          updates.side = member.side;
+        }
+        if (existing.degree !== member.degree) {
+          updates.degree = member.degree;
+        }
+        if (existing.phone !== member.phone) {
+          updates.phone = member.phone;
+        }
+        if (existing.degreeYear !== member.degreeYear) {
+          updates.degreeYear = member.degreeYear;
+        }
         // Shallow compare availabilities:
         if (
           JSON.stringify(existing.availabilities ?? {}) !==
@@ -184,6 +202,10 @@ export const syncSheetMembers = mutation({
           cox: member.cox,
           novice: member.novice,
           availabilities: member.availabilities,
+          side: member.side,
+          degree: member.degree,
+          phone: member.phone,
+          degreeYear: member.degreeYear,
         });
       }
     }

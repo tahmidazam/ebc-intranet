@@ -11,6 +11,12 @@ export default defineSchema({
     emailVerificationTime: v.optional(v.number()),
     isAnonymous: v.optional(v.boolean()),
     role: v.optional(v.string()),
+    side: v.optional(
+      v.union(v.literal("women"), v.literal("men"), v.literal("both"))
+    ),
+    degree: v.optional(v.string()),
+    phone: v.optional(v.string()),
+    degreeYear: v.optional(v.string()),
     sidePreference: v.optional(
       v.union(
         v.literal("strokeside"),
@@ -60,7 +66,7 @@ export default defineSchema({
     three: v.optional(v.id("users")),
     two: v.optional(v.id("users")),
     bow: v.optional(v.id("users")),
-    read: v.optional(v.array(v.string()))
+    read: v.optional(v.array(v.string())),
   })
     .index("collectionId", ["collectionId"])
     .index("cox", ["cox"])

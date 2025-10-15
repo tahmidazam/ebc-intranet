@@ -24,7 +24,7 @@ export async function getAvailabilitiesFromSheet(
 
   const dates = lines[3]
     .split("\t")
-    .slice(15)
+    .slice(13)
     .map((line) => line.trim());
 
   // Remove first 5 rows of matrix:
@@ -33,26 +33,47 @@ export async function getAvailabilitiesFromSheet(
   const members = lines.map((line) => {
     const cells = line.split("\t");
 
-    return {
-      crsid: cells[1],
-      firstName: cells[2],
-      lastName: cells[3],
-      email: cells[4],
-      phone: cells[5],
-      sidePreference: cells[6],
-      cox: cells[7] === "TRUE",
-      novice: cells[8] === "TRUE",
-      availabilities: cells
-        .slice(15)
-        .map((line) => line.trim())
-        .reduce((acc, cell, index) => {
-          const date = dates[index];
-          if (cell !== "") {
-            acc[date] = cell;
-          }
-          return acc;
-        }, {} as Record<string, string>),
+    const availabilities = cells
+      .slice(13)
+      .map((line) => line.trim())
+      .reduce((acc, cell, index) => {
+        const date = dates[index];
+        if (cell !== "") {
+          acc[date] = cell.toLowerCase();
+        }
+        return acc;
+      }, {} as Record<string, string>);
+
+    const crsid = cells[1];
+    const firstName = cells[2];
+    const lastName = cells[3];
+    const email = cells[4];
+    const phone = cells[5] !== "" ? cells[5] : undefined;
+    const degree = cells[6] !== "" ? cells[6] : undefined;
+    const degreeYear = cells[7] !== "" ? cells[7] : undefined;
+    const side = cells[8] !== "" ? cells[8] : undefined;
+    const sidePreference = cells[9];
+    const cox = cells[10] === "TRUE";
+    const novice = cells[11] === "TRUE";
+
+    const member = {
+      crsid,
+      firstName,
+      lastName,
+      email,
+      phone,
+      degree,
+      degreeYear,
+      side,
+      sidePreference,
+      cox,
+      novice,
+      availabilities,
     };
+
+    console.log(member);
+
+    return member;
   });
 
   const parsedMembers = z.array(sheetMemberSchema).parse(members);
