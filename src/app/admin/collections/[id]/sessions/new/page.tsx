@@ -129,13 +129,19 @@ export default function ResolveAvailabilitiesPage({
     COURSE_CASES[0].label
   );
   const [coach, setCoach] = useState<string | undefined>(undefined);
+  const [overrideAvailabilities, setOverrideAvailabilities] =
+    useState<boolean>(false);
 
   const users = useMemo(() => {
     if (!allUsers || !sessions) return [];
 
+    if (overrideAvailabilities) {
+      return allUsers;
+    }
+
     const users = resolveAvailabilities(allUsers, sessions, dateTime, duration);
     return users;
-  }, [allUsers, dateTime, duration, sessions]);
+  }, [allUsers, dateTime, duration, sessions, overrideAvailabilities]);
 
   if (!collections || !allUsers || !sessions || !collection)
     return (
@@ -251,7 +257,7 @@ export default function ResolveAvailabilitiesPage({
 
       <PanelGroup direction="vertical">
         <Panel maxSize={75}>
-          <div className="flex justify-start gap-4 px-2 py-4">
+          <div className="flex justify-start gap-4 px-2 py-4 border-b">
             <DateTimeSelect value={dateTime} setValue={setDateTime} />
 
             <div className="flex flex-col gap-2 w-full">
@@ -287,6 +293,28 @@ export default function ResolveAvailabilitiesPage({
                   <SelectItem value="all">All</SelectItem>
                   <SelectItem value="by-coxes-and-side-preference">
                     By Coxes & Side Preference
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label>Override</Label>
+              <Select
+                value={overrideAvailabilities ? "true" : "false"}
+                onValueChange={(value) =>
+                  setOverrideAvailabilities(value === "true")
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="false">
+                    Use resolved availabilities
+                  </SelectItem>
+                  <SelectItem value="true">
+                    Override (i.e., show all users)
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -574,7 +602,7 @@ function ResolvedUsersTable({
             <TableCell className="w-full flex flex-row justify-between items-center">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <div className="w-full flex flex-row gap-1 flex-wrap items-center cursor-pointer">
+                  <div className="w-full flex flex-row gap-1 flex-wrap items-center cursor-pointer h-6">
                     <p
                       className={cn(
                         Object.values(athletes).includes(user._id)
