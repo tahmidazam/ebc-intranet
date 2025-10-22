@@ -1,12 +1,19 @@
 import { Event } from "@/schemas/event";
 import { formatInTimeZone } from "date-fns-tz";
 
-export function groupEventsByDay(events: Event[]): {
+export function groupEventsByDay(
+  events: Event[],
+  descending = false
+): {
   title: string; // formatted day (EEE MMM d)
   events: Event[];
 }[] {
-  // Sort by time first
-  const sorted = [...events].sort((a, b) => a.start.getTime() - b.start.getTime());
+  const factor = descending ? -1 : 1;
+
+  // Sort by time first (ascending or descending)
+  const sorted = [...events].sort(
+    (a, b) => factor * (a.start.getTime() - b.start.getTime())
+  );
 
   // Group by day key (ISO string for stable grouping)
   const grouped = sorted.reduce<Record<string, Event[]>>((acc, event) => {
@@ -16,11 +23,11 @@ export function groupEventsByDay(events: Event[]): {
     return acc;
   }, {});
 
-  // Build sections with formatted titles
+  // Build sections with formatted titles, ordering days asc/desc based on flag
   return Object.keys(grouped)
-    .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+    .sort((a, b) => factor * (new Date(a).getTime() - new Date(b).getTime()))
     .map((isoKey) => ({
       title: formatInTimeZone(new Date(isoKey), "Europe/London", "EEE MMM d"),
-      events: grouped[isoKey]
+      events: grouped[isoKey],
     }));
 }

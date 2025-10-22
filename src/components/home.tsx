@@ -58,13 +58,25 @@ export function Home() {
       queryResult.users,
       queryResult.collections,
       user._id
-    ).sort((a, b) => a.start.getTime() - b.start.getTime());
+    ).sort((a, b) => {
+      if (sessionsToDisplay === "upcoming") {
+        return a.start.getTime() - b.start.getTime();
+      } else {
+        return b.start.getTime() - a.start.getTime();
+      }
+    });
 
     const now = new Date();
     if (sessionsToDisplay === "upcoming") {
-      return groupEventsByDay(events.filter((event) => event.end > now));
+      return groupEventsByDay(
+        events.filter((event) => event.end > now),
+        sessionsToDisplay === "upcoming"
+      );
     } else {
-      return groupEventsByDay(events.filter((event) => event.end <= now));
+      return groupEventsByDay(
+        events.filter((event) => event.end <= now),
+        sessionsToDisplay === "past"
+      );
     }
   }, [queryResult, user, sessionsToDisplay]);
 
