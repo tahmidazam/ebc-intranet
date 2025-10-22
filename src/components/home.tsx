@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { capitalise } from "@/lib/capitalise";
+import { groupEventsByDay } from "@/lib/group-events-by-day";
 import { sessionsToResolvedEvents } from "@/lib/sessions-to-events";
 import { useIntranetStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -26,10 +27,10 @@ import { useMemo, useState } from "react";
 import { useShallow } from "zustand/shallow";
 import { api } from "../../convex/_generated/api";
 import { CalendarSyncButton } from "./calendar-sync-button";
+import { Directory } from "./directory";
 import { SessionsList } from "./sessions-list";
 import { TabBar } from "./tab-bar";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
-import { groupEventsByDay } from "@/lib/group-events-by-day";
 
 export function Home() {
   const collections = useQuery(api.collections.getUserCollectionsWithLinks);
@@ -37,6 +38,7 @@ export function Home() {
   const { scrollY } = useScroll();
   const [showBorder, setShowBorder] = useState(false);
   const user = useQuery(api.user.currentUser);
+  const allUsers = useQuery(api.user.collect);
   const tab = useIntranetStore(useShallow((state) => state.tab));
   const sessionsToDisplay = useIntranetStore(
     useShallow((state) => state.sessionsToDisplay)
@@ -80,7 +82,7 @@ export function Home() {
     }
   }, [queryResult, user, sessionsToDisplay]);
 
-  if (!collections || !user || !events) {
+  if (!collections || !user || !events || !allUsers) {
     return (
       <main className="flex items-center justify-center h-screen w-full">
         <Loader2Icon className="animate-spin" />
@@ -224,6 +226,8 @@ export function Home() {
             availabilities={user.availabilities ?? {}}
           />
         )}
+
+        {tab === "directory" && <Directory allUsers={allUsers} />}
 
         {tab === "settings" && <Preferences collections={collections} />}
       </div>

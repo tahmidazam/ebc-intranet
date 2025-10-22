@@ -12,8 +12,8 @@ interface IntranetState {
   setKeepCollectionsCollapsed: (value: boolean) => void;
   onlyShowPinnedLinks: boolean;
   setOnlyShowPinnedLinks: (value: boolean) => void;
-  tab: "links" | "sessions" | "settings";
-  setTab: (tab: "links" | "sessions" | "settings") => void;
+  tab: "links" | "sessions" | "directory" | "settings";
+  setTab: (tab: "links" | "sessions" | "directory" | "settings") => void;
   sessionsToDisplay: "upcoming" | "past";
   setSessionsToDisplay: (value: "upcoming" | "past") => void;
 }
