@@ -70,12 +70,12 @@ export function Home() {
     if (sessionsToDisplay === "upcoming") {
       return groupEventsByDay(
         events.filter((event) => event.end > now),
-        sessionsToDisplay === "upcoming"
+        false
       );
     } else {
       return groupEventsByDay(
         events.filter((event) => event.end <= now),
-        sessionsToDisplay === "past"
+        true
       );
     }
   }, [queryResult, user, sessionsToDisplay]);
