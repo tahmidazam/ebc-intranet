@@ -33,7 +33,7 @@ export function TabBar() {
         onClick={() => setTab("sessions")}
       >
         <CalendarIcon className="size-5" />
-        Sessions
+        My Sessions
       </div>
 
       <div
