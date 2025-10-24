@@ -8,8 +8,6 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { SheetMember } from "@/schemas/sheet-member";
 import { getAvailabilitiesFromSheet } from "@/server-actions/get-sheet-info";
@@ -31,11 +29,16 @@ export default function SyncMembersPage() {
     try {
       setLoading(true);
 
-      const csv = await getAvailabilitiesFromSheet(
-        "1swwFSMeQBNK-EzOVvoa6WPUSmLc1o5qYQ2hhflmnwEw",
-        "Availabilities"
-      );
+      const { members: csv, validationErrors } =
+        await getAvailabilitiesFromSheet(
+          "1swwFSMeQBNK-EzOVvoa6WPUSmLc1o5qYQ2hhflmnwEw",
+          "Availabilities"
+        );
       setCsv(csv);
+      if (validationErrors.length > 0) {
+        validationErrors.forEach((error) => toast.error(error));
+        return;
+      }
     } catch (error) {
       console.error(error);
       toast.error("Failed to get sheet info.");

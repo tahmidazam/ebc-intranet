@@ -1,6 +1,7 @@
 "use server";
 
 import { getGoogleJWT } from "@/lib/get-google-jwt";
+import { validateAvailability } from "@/lib/validate-availability";
 import { SheetMember, sheetMemberSchema } from "@/schemas/sheet-member";
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import { z } from "zod";
@@ -8,7 +9,10 @@ import { z } from "zod";
 export async function getAvailabilitiesFromSheet(
   docId: string,
   sheetTitle: string
-): Promise<SheetMember[]> {
+): Promise<{
+  members: SheetMember[];
+  validationErrors: string[];
+}> {
   const jwt = getGoogleJWT();
   const doc = new GoogleSpreadsheet(docId, jwt);
 
@@ -30,19 +34,10 @@ export async function getAvailabilitiesFromSheet(
   // Remove first 5 rows of matrix:
   lines.splice(0, 5);
 
+  const validationErrors: string[] = [];
+
   const members = lines.map((line) => {
     const cells = line.split("\t");
-
-    const availabilities = cells
-      .slice(13)
-      .map((line) => line.trim())
-      .reduce((acc, cell, index) => {
-        const date = dates[index];
-        if (cell !== "") {
-          acc[date] = cell.toLowerCase();
-        }
-        return acc;
-      }, {} as Record<string, string>);
 
     const crsid = cells[1];
     const firstName = cells[2];
@@ -55,6 +50,24 @@ export async function getAvailabilitiesFromSheet(
     const sidePreference = cells[9];
     const cox = cells[10] === "TRUE";
     const novice = cells[11] === "TRUE";
+
+    const availabilities = cells
+      .slice(13)
+      .map((line) => line.trim())
+      .reduce((acc, cell, index) => {
+        const date = dates[index];
+        if (cell !== "") {
+          acc[date] = cell.toLowerCase();
+
+          if (!validateAvailability(cell)) {
+            validationErrors.push(
+              `Invalid availability for ${firstName} ${lastName} on ${date}: ${cell}`
+            );
+          }
+        }
+
+        return acc;
+      }, {} as Record<string, string>);
 
     const member = {
       crsid,
@@ -78,5 +91,8 @@ export async function getAvailabilitiesFromSheet(
 
   const parsedMembers = z.array(sheetMemberSchema).parse(members);
 
-  return parsedMembers;
+  return {
+    members: parsedMembers,
+    validationErrors,
+  };
 }
