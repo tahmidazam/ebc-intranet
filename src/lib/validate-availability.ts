@@ -5,8 +5,8 @@ export function validateAvailability(input: string): boolean {
   // Allow simple "busy" or "free"
   if (trimmed === "busy" || trimmed === "free") return true;
 
-  // Define a regex for valid 24-hour times (00:00–23:59)
-  const time = "(?:[01]\\d|2[0-3]):[0-5]\\d";
+  // Define a regex for valid 24-hour times, allowing 0–9 or 00–23 hours
+  const time = "(?:[0-9]|[01]\\d|2[0-3]):[0-5]\\d";
 
   // Each valid segment can be:
   // - -HH:MM (busy until)
