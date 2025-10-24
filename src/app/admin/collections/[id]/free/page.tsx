@@ -30,7 +30,7 @@ import { Loader2Icon } from "lucide-react";
 import { use, useMemo } from "react";
 import { api } from "../../../../../../convex/_generated/api";
 import { Id } from "../../../../../../convex/_generated/dataModel";
-import { columns } from "./columns";
+import { getColumns } from "./columns";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -55,18 +55,29 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       d.setDate(d.getDate() + 1)
     ) {
       const key = format(d, "EEE MMM d");
-      const values = users
-        .map((user) => user.availabilities?.[key])
+      const userMap = users
+        .map((user) => {
+          return {
+            availability: user.availabilities?.[key],
+            id: user._id,
+          };
+        })
+        .filter((v) => v.availability !== undefined);
+      const values = userMap
+        .map((v) => v.availability)
         .filter((v) => v !== undefined);
       const resolved = findFreeIntervals(values);
       result.push({
         key,
         values,
         resolved,
+        userIds: userMap.map((v) => v.id),
       });
     }
     return result;
   }, [users]);
+
+  const columns = useMemo(() => getColumns(users ?? []), [users]);
 
   const table = useReactTable({
     data: days ?? [],
