@@ -44,11 +44,16 @@ export async function GET(
           userId: id as Id<"users">,
         });
 
+    // Return an empty iCal if no events to avoid errors on client when attempting to sync
     if (!sessions?.length) {
-      return NextResponse.json(
-        { message: "No sessions found" },
-        { status: 404 }
-      );
+      return new NextResponse(ical({
+        name: `EBC - No sessions`,
+      }).toString(), {
+      headers: {
+        "Content-Type": "text/calendar; charset=utf-8",
+        "Content-Disposition": `attachment; filename="no-sessions.ics"`,
+      },
+      });
     }
 
     // Collect unique IDs in a single pass
