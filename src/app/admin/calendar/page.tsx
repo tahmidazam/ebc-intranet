@@ -113,7 +113,7 @@ export default function AdminCalendar() {
           titleAccessor="summary"
           popup
           onSelectEvent={setSelectedEvent}
-          className="w-full h-full p-4"
+          className="w-full h-full p-4 pt-2"
         />
 
         <Sheet
