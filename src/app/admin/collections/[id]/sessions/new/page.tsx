@@ -247,7 +247,6 @@ export default function ResolveAvailabilitiesPage({
 
               insertSession(dto);
               toast.success("Session added");
-              setAthletes({});
             }}
           >
             Add Session
