@@ -31,7 +31,7 @@ const locales = {
 const localizer = dateFnsLocalizer({
   format,
   parse,
-  startOfWeek,
+  startOfWeek: () => startOfWeek(new Date(), { weekStartsOn: 1 }),
   getDay,
   locales,
 });
@@ -71,6 +71,7 @@ export default function AdminCalendar() {
   return (
     <div className="h-screen w-full">
       <Calendar
+        culture="en-GB"
         localizer={localizer}
         events={events}
         startAccessor="start"
