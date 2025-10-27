@@ -182,7 +182,7 @@ export default function AdminCalendar() {
                 ) && (
                   <Button variant="outline" className="rounded-full">
                     <Link
-                      href={`http://localhost:3000/admin/collections/${
+                      href={`/admin/collections/${
                         collections.find(
                           (v) => v.title === selectedEvent.collectionTitle
                         )?._id
@@ -195,7 +195,7 @@ export default function AdminCalendar() {
 
                 <Button className="rounded-full">
                   <Link
-                    href={`http://localhost:3000/admin/collections/${
+                    href={`/admin/collections/${
                       collections.find(
                         (v) => v.title === selectedEvent.collectionTitle
                       )?._id
