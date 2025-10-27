@@ -99,7 +99,7 @@ export default function AdminCalendar() {
         </div>
       </header>
 
-      <div className="h-full w-full">
+      <div className="grow w-full">
         <Calendar
           culture="en-GB"
           localizer={localizer}
