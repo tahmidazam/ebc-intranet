@@ -1,5 +1,13 @@
 "use client";
 
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -9,6 +17,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { abbreviateName } from "@/lib/abbreviate-name";
 import { sessionsToResolvedEvents } from "@/lib/sessions-to-events";
 import { cn } from "@/lib/utils";
@@ -69,146 +78,172 @@ export default function AdminCalendar() {
     );
 
   return (
-    <div className="h-screen w-full">
-      <Calendar
-        culture="en-GB"
-        localizer={localizer}
-        events={events}
-        startAccessor="start"
-        endAccessor="end"
-        view={view}
-        onView={handleViewChange}
-        date={date}
-        onNavigate={handleNavigate}
-        titleAccessor="summary"
-        popup
-        onSelectEvent={setSelectedEvent}
-        className="w-full h-full p-4"
-      />
+    <main className="w-full flex flex-col h-screen overflow-auto">
+      <header className="flex flex-row items-center p-2 justify-between sticky">
+        <div className="flex flex-row items-center gap-4">
+          <SidebarTrigger variant="outline" className="rounded-full" />
 
-      <Sheet
-        open={selectedEvent !== null}
-        onOpenChange={() => setSelectedEvent(null)}
-      >
-        <SheetContent>
-          {selectedEvent && (
-            <>
-              <SheetHeader>
-                <SheetTitle>{`${formatInTimeZone(
-                  selectedEvent.start,
-                  "Europe/London",
-                  "HH:mm"
-                )}–${formatInTimeZone(
-                  selectedEvent.end,
-                  "Europe/London",
-                  "HH:mm"
-                )} (${selectedEvent.duration}min)`}</SheetTitle>
-                <SheetDescription>{selectedEvent.summary}</SheetDescription>
-              </SheetHeader>
-              <div key={selectedEvent.id} className="flex flex-col px-4 gap-2">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="flex flex-col gap-1">
-                    {selectedEvent.boat && (
-                      <div>
-                        <p className="text-muted-foreground">Boat</p>
-                        <p>{selectedEvent.boat}</p>
-                      </div>
-                    )}
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/admin">Admin</BreadcrumbLink>
+              </BreadcrumbItem>
 
-                    {selectedEvent.coachName && (
-                      <div>
-                        <p className="text-muted-foreground">Coach</p>
-                        <p>{selectedEvent.coachName}</p>
-                      </div>
-                    )}
+              <BreadcrumbSeparator />
 
-                    {selectedEvent.course && selectedEvent.distance && (
-                      <div>
-                        <p className="text-muted-foreground">
-                          Course & Distance
-                        </p>
-                        <p>{`${selectedEvent.course} (${selectedEvent.distance}km)`}</p>
-                      </div>
-                    )}
+              <BreadcrumbItem>
+                <BreadcrumbPage>Calendar</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+      </header>
+
+      <div className="h-full w-full">
+        <Calendar
+          culture="en-GB"
+          localizer={localizer}
+          events={events}
+          startAccessor="start"
+          endAccessor="end"
+          view={view}
+          onView={handleViewChange}
+          date={date}
+          onNavigate={handleNavigate}
+          titleAccessor="summary"
+          popup
+          onSelectEvent={setSelectedEvent}
+          className="w-full h-full p-4"
+        />
+
+        <Sheet
+          open={selectedEvent !== null}
+          onOpenChange={() => setSelectedEvent(null)}
+        >
+          <SheetContent>
+            {selectedEvent && (
+              <>
+                <SheetHeader>
+                  <SheetTitle>{`${formatInTimeZone(
+                    selectedEvent.start,
+                    "Europe/London",
+                    "HH:mm"
+                  )}–${formatInTimeZone(
+                    selectedEvent.end,
+                    "Europe/London",
+                    "HH:mm"
+                  )} (${selectedEvent.duration}min)`}</SheetTitle>
+                  <SheetDescription>{selectedEvent.summary}</SheetDescription>
+                </SheetHeader>
+                <div
+                  key={selectedEvent.id}
+                  className="flex flex-col px-4 gap-2"
+                >
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="flex flex-col gap-1">
+                      {selectedEvent.boat && (
+                        <div>
+                          <p className="text-muted-foreground">Boat</p>
+                          <p>{selectedEvent.boat}</p>
+                        </div>
+                      )}
+
+                      {selectedEvent.coachName && (
+                        <div>
+                          <p className="text-muted-foreground">Coach</p>
+                          <p>{selectedEvent.coachName}</p>
+                        </div>
+                      )}
+
+                      {selectedEvent.course && selectedEvent.distance && (
+                        <div>
+                          <p className="text-muted-foreground">
+                            Course & Distance
+                          </p>
+                          <p>{`${selectedEvent.course} (${selectedEvent.distance}km)`}</p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-[auto_1fr_auto] gap-x-2 auto-rows-min items-center">
+                      {selectedEvent.seats &&
+                        SEAT_LABELS.map((seatLabel) => {
+                          const name = selectedEvent.seats[seatLabel]?.name;
+                          const id = selectedEvent.seats[seatLabel]?.id;
+                          if (!name || !id) return null;
+                          return (
+                            <React.Fragment key={seatLabel}>
+                              <p
+                                className={cn(
+                                  "text-muted-foreground",
+                                  selectedEvent.userSeat === seatLabel &&
+                                    "italic"
+                                )}
+                              >
+                                {seatLabel}
+                              </p>
+                              <p
+                                className={cn(
+                                  selectedEvent.userSeat === seatLabel &&
+                                    "font-medium italic"
+                                )}
+                              >
+                                {abbreviateName(name)}
+                              </p>
+
+                              {selectedEvent.read.includes(id) ? (
+                                <CircleCheck className="size-4 text-green-500" />
+                              ) : (
+                                <CircleQuestionMark className="size-4 text-muted-foreground" />
+                              )}
+                            </React.Fragment>
+                          );
+                        })}
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-[auto_1fr_auto] gap-x-2 auto-rows-min items-center">
-                    {selectedEvent.seats &&
-                      SEAT_LABELS.map((seatLabel) => {
-                        const name = selectedEvent.seats[seatLabel]?.name;
-                        const id = selectedEvent.seats[seatLabel]?.id;
-                        if (!name || !id) return null;
-                        return (
-                          <React.Fragment key={seatLabel}>
-                            <p
-                              className={cn(
-                                "text-muted-foreground",
-                                selectedEvent.userSeat === seatLabel && "italic"
-                              )}
-                            >
-                              {seatLabel}
-                            </p>
-                            <p
-                              className={cn(
-                                selectedEvent.userSeat === seatLabel &&
-                                  "font-medium italic"
-                              )}
-                            >
-                              {abbreviateName(name)}
-                            </p>
-
-                            {selectedEvent.read.includes(id) ? (
-                              <CircleCheck className="size-4 text-green-500" />
-                            ) : (
-                              <CircleQuestionMark className="size-4 text-muted-foreground" />
-                            )}
-                          </React.Fragment>
-                        );
-                      })}
-                  </div>
+                  {selectedEvent.outline && selectedEvent.outline != "" && (
+                    <div className="text-sm">
+                      <span className="text-muted-foreground">Outline</span>
+                      <p>{selectedEvent.outline}</p>
+                    </div>
+                  )}
                 </div>
 
-                {selectedEvent.outline && selectedEvent.outline != "" && (
-                  <div className="text-sm">
-                    <span className="text-muted-foreground">Outline</span>
-                    <p>{selectedEvent.outline}</p>
-                  </div>
-                )}
-              </div>
+                <SheetFooter>
+                  {collections.find(
+                    (v) => v.title === selectedEvent.collectionTitle
+                  ) && (
+                    <Button variant="outline" className="rounded-full">
+                      <Link
+                        href={`/admin/collections/${
+                          collections.find(
+                            (v) => v.title === selectedEvent.collectionTitle
+                          )?._id
+                        }/sessions`}
+                      >
+                        Go to sessions for {selectedEvent.collectionTitle}
+                      </Link>
+                    </Button>
+                  )}
 
-              <SheetFooter>
-                {collections.find(
-                  (v) => v.title === selectedEvent.collectionTitle
-                ) && (
-                  <Button variant="outline" className="rounded-full">
+                  <Button className="rounded-full">
                     <Link
                       href={`/admin/collections/${
                         collections.find(
                           (v) => v.title === selectedEvent.collectionTitle
                         )?._id
-                      }/sessions`}
+                      }/sessions/${selectedEvent.id}/edit`}
                     >
-                      Go to sessions for {selectedEvent.collectionTitle}
+                      Edit Session
                     </Link>
                   </Button>
-                )}
-
-                <Button className="rounded-full">
-                  <Link
-                    href={`/admin/collections/${
-                      collections.find(
-                        (v) => v.title === selectedEvent.collectionTitle
-                      )?._id
-                    }/sessions/${selectedEvent.id}/edit`}
-                  >
-                    Edit Session
-                  </Link>
-                </Button>
-              </SheetFooter>
-            </>
-          )}
-        </SheetContent>
-      </Sheet>
-    </div>
+                </SheetFooter>
+              </>
+            )}
+          </SheetContent>
+        </Sheet>
+      </div>
+    </main>
   );
 }
