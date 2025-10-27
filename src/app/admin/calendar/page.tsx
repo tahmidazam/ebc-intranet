@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/sheet";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { abbreviateName } from "@/lib/abbreviate-name";
+import { getColorFromString } from "@/lib/color-for-title";
 import { sessionsToResolvedEvents } from "@/lib/sessions-to-events";
 import { cn } from "@/lib/utils";
 import { Event } from "@/schemas/event";
@@ -111,6 +112,17 @@ export default function AdminCalendar() {
           date={date}
           onNavigate={handleNavigate}
           titleAccessor="summary"
+          eventPropGetter={(event: any) => {
+            const title = event.summary || event.title || "";
+            const { background, text } = getColorFromString(title);
+            return {
+              style: {
+                backgroundColor: background,
+                color: text,
+                border: "none",
+              },
+            };
+          }}
           popup
           onSelectEvent={setSelectedEvent}
           className="w-full h-full p-4 pt-2"
