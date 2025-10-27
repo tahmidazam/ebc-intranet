@@ -15,6 +15,7 @@ import {
 import { UserSidebarMenuItem } from "@/components/user-sidebar-menu-item";
 import {
   Bike,
+  Calendar,
   ChevronLeft,
   FolderGit,
   FolderSyncIcon,
@@ -30,6 +31,11 @@ const items = [
     title: "Collections",
     href: "/admin/collections",
     icon: Library,
+  },
+  {
+    title: "Calendar",
+    href: "/admin/calendar",
+    icon: Calendar,
   },
   {
     title: "Members",

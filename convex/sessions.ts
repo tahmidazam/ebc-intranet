@@ -3,6 +3,13 @@ import { v } from "convex/values";
 import { Doc, Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 
+export const collect = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("sessions").collect();
+  },
+});
+
 export const insert = mutation({
   args: {
     timestamp: v.number(),
@@ -207,7 +214,7 @@ export const markAsRead = mutation({
       throw new Error("Not authenticated");
     }
     await ctx.db.patch(args.id, {
-      read: [...args.existing, userId]
+      read: [...args.existing, userId],
     });
   },
-})
+});
