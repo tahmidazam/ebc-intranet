@@ -112,9 +112,8 @@ export default function AdminCalendar() {
           date={date}
           onNavigate={handleNavigate}
           titleAccessor="summary"
-          eventPropGetter={(event: any) => {
-            const title = event.summary || event.title || "";
-            const { background, text } = getColorFromString(title);
+          eventPropGetter={(event: Event) => {
+            const { background, text } = getColorFromString(event.id);
             return {
               style: {
                 backgroundColor: background,
