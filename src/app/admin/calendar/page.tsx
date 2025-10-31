@@ -70,6 +70,24 @@ export default function AdminCalendar() {
 
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
+  const eventStyleGetter = (event: Event) => {
+    const hasOutline = Boolean(
+      event.outline && String(event.outline).trim() !== ""
+    );
+    const hasCoach = Boolean(
+      event.coachName && String(event.coachName).trim() !== ""
+    );
+    if (!hasOutline && !hasCoach) {
+      const colour = "#ef4444";
+      return { style: { backgroundColor: colour, borderColor: colour } };
+    }
+    if (!hasOutline || !hasCoach) {
+      const colour = "#f97316";
+      return { style: { backgroundColor: colour, borderColor: colour } };
+    }
+    return {};
+  };
+
   if (!sessions || !users || !collections)
     return (
       <main className="flex items-center justify-center h-screen w-full">
@@ -106,6 +124,7 @@ export default function AdminCalendar() {
           events={events}
           startAccessor="start"
           endAccessor="end"
+          eventPropGetter={eventStyleGetter as any}
           view={view}
           onView={handleViewChange}
           date={date}
