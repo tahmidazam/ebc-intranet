@@ -119,7 +119,7 @@ export function Home() {
                 </Button>
               </SheetTrigger>
 
-              <SheetContent className="gap-0">
+              <SheetContent className="gap-0 overflow-y-auto">
                 <SheetHeader>
                   <SheetTitle>Preferences</SheetTitle>
                   <SheetDescription className="sr-only">

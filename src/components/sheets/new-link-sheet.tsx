@@ -45,7 +45,7 @@ export function NewLinkSheet({
     <Sheet>
       <SheetTrigger asChild>{children}</SheetTrigger>
 
-      <SheetContent>
+      <SheetContent className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle>New Link</SheetTitle>
           <SheetDescription>

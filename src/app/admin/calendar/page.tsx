@@ -139,7 +139,7 @@ export default function AdminCalendar() {
           open={selectedEvent !== null}
           onOpenChange={() => setSelectedEvent(null)}
         >
-          <SheetContent>
+          <SheetContent className="overflow-y-auto">
             {selectedEvent && (
               <>
                 <SheetHeader>
