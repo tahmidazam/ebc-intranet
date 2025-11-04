@@ -94,7 +94,7 @@ export default function EditSession({
               <BreadcrumbSeparator />
 
               <BreadcrumbItem>
-                <BreadcrumbPage>Edit</BreadcrumbPage>
+                <BreadcrumbPage>Comments</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
