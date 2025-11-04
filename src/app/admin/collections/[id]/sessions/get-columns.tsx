@@ -155,6 +155,19 @@ export const getColumns = (
     },
   },
   {
+    id: "comments",
+    cell: ({ row }) => {
+      return (
+        <Link
+          className="underline underline-offset-4 decoration-border"
+          href={`/admin/collections/${collectionId}/sessions/${row.original._id}/comments`}
+        >
+          View Comments
+        </Link>
+      );
+    },
+  },
+  {
     id: "edit",
     cell: ({ row }) => {
       return (

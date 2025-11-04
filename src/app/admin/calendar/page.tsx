@@ -252,6 +252,18 @@ export default function AdminCalendar() {
                         collections.find(
                           (v) => v.title === selectedEvent.collectionTitle
                         )?._id
+                      }/sessions/${selectedEvent.id}/comments`}
+                    >
+                      View Comments
+                    </Link>
+                  </Button>
+
+                  <Button className="rounded-full">
+                    <Link
+                      href={`/admin/collections/${
+                        collections.find(
+                          (v) => v.title === selectedEvent.collectionTitle
+                        )?._id
                       }/sessions/${selectedEvent.id}/edit`}
                     >
                       Edit Session
