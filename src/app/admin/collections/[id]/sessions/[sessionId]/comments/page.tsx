@@ -44,7 +44,7 @@ export default function EditSession({
 
   return (
     <main className="w-full flex flex-col h-screen overflow-auto">
-      <header className="flex flex-row items-center p-2 justify-between">
+      <header className="flex flex-row items-center p-2 justify-between border-b sticky top-0 bg-background z-10">
         <div className="flex flex-row items-center gap-4">
           <SidebarTrigger variant="outline" className="rounded-full" />
 
@@ -103,7 +103,9 @@ export default function EditSession({
         <div></div>
       </header>
 
-      <CommentsList comments={comments} />
+      <div className="mx-auto max-w-lg">
+        <CommentsList comments={comments} />
+      </div>
     </main>
   );
 }
