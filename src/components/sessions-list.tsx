@@ -4,8 +4,9 @@ import { Event } from "@/schemas/event";
 import { SEAT_LABELS } from "@/schemas/seat";
 import { useMutation, useQuery } from "convex/react";
 import { formatInTimeZone } from "date-fns-tz";
-import { Check, CircleCheck, CircleQuestionMark, Eye } from "lucide-react";
+import { Check, CircleCheck, CircleQuestionMark, Eye, Sunrise, Sunset } from "lucide-react";
 import React from "react";
+import { useEffect, useState } from "react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 import { CommentsDrawer } from "./comments-drawer";
@@ -30,10 +31,34 @@ export function SessionsList({
       </div>
     );
   }
+  
+  const [lightingData, setLightingData] = useState<Record<string, { sunrise: string; sunset: string }>>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchLighting() {
+      try {
+        const res = await fetch("/api/lighting");
+        if (!res.ok) throw new Error("Failed to fetch lighting data");
+        const data = await res.json();
+        setLightingData(data);
+      } catch (err) {
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchLighting();
+  }, []);
 
   return (
     <div className="flex flex-col">
       {groupedEvents.map((section) => {
+        // Extract date in YYYY-MM-DD format for lighting lookup
+        const sectionDate = section.events[0]?.start 
+          ? formatInTimeZone(section.events[0].start, "Europe/London", "yyyy-MM-dd")
+          : null;
+        const lighting = sectionDate ? lightingData[sectionDate] : null;
         return (
           <div key={section.title} className="flex flex-col first:pt-0 pt-4">
             <div
@@ -42,9 +67,23 @@ export function SessionsList({
                 top: "calc(env(safe-area-inset-top) + 100px)",
               }}
             >
-              <h2 className="whitespace-nowrap font-semibold text-sm">
-                {section.title}
-              </h2>
+              <div className="flex items-center gap-3">
+                <h2 className="whitespace-nowrap font-semibold text-sm">
+                  {section.title}
+                </h2>
+                {!loading && lighting && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <Sunrise className="size-3" />
+                      <span>{lighting.sunrise}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Sunset className="size-3" />
+                      <span>{lighting.sunset}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {availabilities[section.title] && (
                 <Badge variant="outline">{availabilities[section.title]}</Badge>
