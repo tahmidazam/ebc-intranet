@@ -318,3 +318,33 @@ export const getUserSessionCounts = query({
     });
   },
 });
+
+export const swapSeat = mutation({
+  args: {
+    sessionId: v.id("sessions"),
+    seat: v.union(
+      v.literal("cox"),
+      v.literal("stroke"),
+      v.literal("seven"),
+      v.literal("six"),
+      v.literal("five"),
+      v.literal("four"),
+      v.literal("three"),
+      v.literal("two"),
+      v.literal("bow")
+    ),
+    userId: v.id("users"),
+  },
+  handler: async (ctx, { sessionId, seat, userId }) => {
+    const session = await ctx.db.get(sessionId);
+    if (!session) throw new Error("Session not found.");
+
+    const previousUser = session[seat];
+
+    await ctx.db.patch(sessionId, {
+      [seat]: userId,
+    });
+
+    return;
+  },
+});

@@ -5,10 +5,10 @@ import { capitalise } from "@/lib/capitalise";
 import { formatName } from "@/lib/format-name";
 import { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
-import Link from "next/link";
-import { Doc, Id } from "../../../../../../convex/_generated/dataModel";
-import React from "react";
 import { CircleCheck, CircleQuestionMark } from "lucide-react";
+import Link from "next/link";
+import React from "react";
+import { Doc, Id } from "../../../../../../convex/_generated/dataModel";
 
 export const getColumns = (
   users: Doc<"users">[],
@@ -132,7 +132,12 @@ export const getColumns = (
             return (
               <React.Fragment key={seat}>
                 <p className="text-muted-foreground">{capitalise(seat)}</p>
-                <p>{formatName(user)}</p>
+                <Link
+                  href={`/admin/collections/${collectionId}/sessions/${row.original._id}/swap/${seatPropMap[seat]}`}
+                  className="underline underline-offset-4 decoration-border"
+                >
+                  {formatName(user)}
+                </Link>
                 {seatId &&
                 typeof seatId === "string" &&
                 row.original.read?.includes(seatId) ? (
