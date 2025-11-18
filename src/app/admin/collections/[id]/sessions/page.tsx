@@ -29,7 +29,13 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useQuery } from "convex/react";
-import { FolderSyncIcon, Loader2Icon, PlusIcon, TrashIcon } from "lucide-react";
+import {
+  Calculator,
+  FolderSyncIcon,
+  Loader2Icon,
+  PlusIcon,
+  TrashIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { use, useMemo, useState } from "react";
 import { api } from "../../../../../../convex/_generated/api";
@@ -135,6 +141,12 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             }
           >
             <FolderSyncIcon />
+          </Button>
+
+          <Button variant="outline" size="icon" className="rounded-full">
+            <Link href={`/admin/collections/${id}/sessions/count`}>
+              <Calculator />
+            </Link>
           </Button>
 
           <Button variant="outline" size="icon" className="rounded-full">

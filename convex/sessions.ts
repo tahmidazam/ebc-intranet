@@ -180,7 +180,11 @@ export const getById = query({
 export const update = mutation({
   args: {
     id: v.id("sessions"),
-    type: v.union(v.literal("water"), v.literal("land")),
+    type: v.union(
+      v.literal("water"),
+      v.literal("land"),
+      v.literal("cancelled")
+    ),
     outline: v.optional(v.string()),
     boat: v.optional(v.string()),
     course: v.optional(v.string()),
@@ -215,6 +219,102 @@ export const markAsRead = mutation({
     }
     await ctx.db.patch(args.id, {
       read: [...args.existing, userId],
+    });
+  },
+});
+
+export const getUserSessionCounts = query({
+  args: { collectionId: v.id("collections") },
+  handler: async (ctx, { collectionId }) => {
+    const now = Date.now();
+
+    const memberRows = await ctx.db
+      .query("collectionMembers")
+      .withIndex("collectionId", (q) => q.eq("collectionId", collectionId))
+      .collect();
+
+    const userIds = memberRows.map((m) => m.userId as Id<"users">);
+    const users = (
+      await Promise.all(userIds.map((id) => ctx.db.get(id)))
+    ).filter((u): u is Doc<"users"> => u !== null);
+
+    const sessions = await ctx.db
+      .query("sessions")
+      .withIndex("collectionId", (q) => q.eq("collectionId", collectionId))
+      .collect();
+
+    type CountObj = {
+      pastWater: number;
+      pastLand: number;
+      pastCancelled: number;
+      upcomingWater: number;
+      upcomingLand: number;
+      upcomingCancelled: number;
+    };
+
+    const emptyCounts: CountObj = {
+      pastWater: 0,
+      pastLand: 0,
+      pastCancelled: 0,
+      upcomingWater: 0,
+      upcomingLand: 0,
+      upcomingCancelled: 0,
+    };
+
+    const counts: Record<string, CountObj> = {};
+
+    for (const id of userIds) {
+      counts[id] = { ...emptyCounts };
+    }
+
+    const seatFields = [
+      "cox",
+      "stroke",
+      "seven",
+      "six",
+      "five",
+      "four",
+      "three",
+      "two",
+      "bow",
+    ] as const;
+
+    for (const s of sessions) {
+      const isPast = s.timestamp < now;
+      const prefix = isPast ? "past" : "upcoming";
+
+      for (const seat of seatFields) {
+        const uid = s[seat];
+        if (!uid || !counts[uid]) continue;
+
+        switch (s.type) {
+          case "water":
+            counts[uid][`${prefix}Water`] += 1;
+            break;
+          case "land":
+            counts[uid][`${prefix}Land`] += 1;
+            break;
+          case "cancelled":
+            counts[uid][`${prefix}Cancelled`] += 1;
+            break;
+        }
+      }
+    }
+
+    return users.map((u) => {
+      const c = counts[u._id];
+
+      return {
+        user: u,
+        pastWater: c.pastWater,
+        pastLand: c.pastLand,
+        pastCancelled: c.pastCancelled,
+        pastTotal: c.pastWater + c.pastLand + c.pastCancelled,
+        upcomingWater: c.upcomingWater,
+        upcomingLand: c.upcomingLand,
+        upcomingCancelled: c.upcomingCancelled,
+        upcomingTotal: c.upcomingWater + c.upcomingLand + c.upcomingCancelled,
+      };
     });
   },
 });

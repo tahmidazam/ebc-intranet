@@ -25,6 +25,7 @@ export function SessionTypeSelect({
         <SelectContent>
           <SelectItem value="water">Water</SelectItem>
           <SelectItem value="land">Land</SelectItem>
+          <SelectItem value="cancelled">Cancelled</SelectItem>
         </SelectContent>
       </Select>
     </div>

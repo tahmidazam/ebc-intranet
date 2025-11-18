@@ -227,7 +227,7 @@ export default function ResolveAvailabilitiesPage({
               const schema = z.object({
                 timestamp: z.number(),
                 duration: z.number(),
-                type: z.enum(["water", "land"]),
+                type: z.enum(["water", "land", "cancelled"]),
                 outline: z.string(),
                 collectionId: z.string(),
                 boat: z.string().optional(),

@@ -49,7 +49,11 @@ export default defineSchema({
   sessions: defineTable({
     timestamp: v.number(),
     duration: v.number(),
-    type: v.union(v.literal("water"), v.literal("land")),
+    type: v.union(
+      v.literal("water"),
+      v.literal("land"),
+      v.literal("cancelled")
+    ),
     outline: v.optional(v.string()),
     collectionId: v.id("collections"),
     boat: v.optional(v.string()),

@@ -47,7 +47,7 @@ export default function EditSession({
   });
   const updateSession = useMutation(api.sessions.update);
 
-  const [type, setType] = useState<"water" | "land">("water");
+  const [type, setType] = useState<"water" | "land" | "cancelled">("water");
   const [boat, setBoat] = useState<string | undefined>(undefined);
   const [distance, setDistance] = useState<number | undefined>(undefined);
   const [course, setCourse] = useState<string | undefined>(undefined);
