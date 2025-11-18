@@ -118,7 +118,7 @@ export default function ResolveAvailabilitiesPage({
     "by-coxes-and-side-preference"
   );
   const [outline, setOutline] = useState("");
-  const [type, setType] = useState<"water" | "land">("water");
+  const [type, setType] = useState<"water" | "land" | "cancelled">("water");
   const [configuration, setConfiguration] = useState<"8+" | "4+">("8+");
   const [boat, setBoat] = useState<string | undefined>(BOATS[0].name);
   const [athletes, setAthletes] = useState<Record<string, Id<"users">>>({});
