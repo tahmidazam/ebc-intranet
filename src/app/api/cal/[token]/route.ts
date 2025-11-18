@@ -37,6 +37,12 @@ export async function GET(
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
+    const formattedName = coach ? id : user ? formatName(user) : "Unknown";
+    // Create calendar
+    const calendar = ical({
+      name: `EBC ${coach ? "Coaching " : ""}(${formattedName})`,
+    });
+    
     // Single query for sessions
     const sessions = coach
       ? await fetchQuery(api.sessions.getByCoach, { coach: id })
@@ -44,11 +50,14 @@ export async function GET(
           userId: id as Id<"users">,
         });
 
+    // Return an empty iCal if no events to avoid errors on client when attempting to sync
     if (!sessions?.length) {
-      return NextResponse.json(
-        { message: "No sessions found" },
-        { status: 404 }
-      );
+      return new NextResponse(calendar.toString(), {
+      headers: {
+        "Content-Type": "text/calendar; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${formattedName}-sessions.ics"`,
+      },
+      });
     }
 
     // Collect unique IDs in a single pass
@@ -83,12 +92,6 @@ export async function GET(
         )
       ),
     ]);
-
-    const formattedName = coach ? id : user ? formatName(user) : "Unknown";
-    // Create calendar
-    const calendar = ical({
-      name: `EBC ${coach ? "Coaching " : ""}(${formattedName})`,
-    });
 
     // Convert sessions to events using the extracted function
     const events = sessionsToICalEventData({
