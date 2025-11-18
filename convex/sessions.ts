@@ -14,7 +14,11 @@ export const insert = mutation({
   args: {
     timestamp: v.number(),
     duration: v.number(),
-    type: v.union(v.literal("water"), v.literal("land")),
+    type: v.union(
+      v.literal("water"),
+      v.literal("land"),
+      v.literal("cancelled")
+    ),
     athletes: v.record(v.string(), v.id("users")),
     outline: v.optional(v.string()),
     collectionId: v.id("collections"),
